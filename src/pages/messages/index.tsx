@@ -8,17 +8,38 @@ import type { Conversation } from "@/types";
 
 export default function MessagesPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      router.push("/login");
-      return;
+    if (!isLoading && !user) router.push("/login");
+  }, [user, isLoading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    fetch("/api/messages").then(r => r.json()).then(d => {
+      setConversations(d.conversations || []);
+      setLoading(false);
+    });
+
+    // Handle ?breeder= param for starting new conversation
+    const breederId = router.query.breeder as string;
+    if (breederId) {
+      fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientId: breederId }),
+      }).then(r => {
+        if (r.ok) {
+          router.replace("/messages", undefined, { shallow: true });
+          // Refresh conversations
+          fetch("/api/messages").then(r => r.json()).then(d => setConversations(d.conversations || []));
+        }
+      });
     }
-    fetch("/api/messages").then(r => r.json()).then(d => setConversations(d.conversations || []));
-  }, [user, loading, router]);
+  }, [user, router.query.breeder]);
 
   if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
   if (!user) return null;
