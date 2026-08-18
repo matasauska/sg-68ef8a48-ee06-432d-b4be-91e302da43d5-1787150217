@@ -96,7 +96,7 @@ export async function seedDemoData() {
 
   const adminUser: User = {
     id: uuidv4(),
-    email: "admin@pawmarket.demo",
+    email: "admin@breedela.demo",
     passwordHash: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
     firstName: "Admin",
     lastName: "User",
@@ -108,7 +108,7 @@ export async function seedDemoData() {
 
   const breederUser1: User = {
     id: uuidv4(),
-    email: "breeder1@pawmarket.demo",
+    email: "breeder1@breedela.demo",
     passwordHash: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
     firstName: "Maria",
     lastName: "Schneider",
@@ -121,7 +121,7 @@ export async function seedDemoData() {
 
   const breederUser2: User = {
     id: uuidv4(),
-    email: "breeder2@pawmarket.demo",
+    email: "breeder2@breedela.demo",
     passwordHash: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
     firstName: "Jan",
     lastName: "Van Dijk",
@@ -134,7 +134,7 @@ export async function seedDemoData() {
 
   const buyerUser: User = {
     id: uuidv4(),
-    email: "buyer@pawmarket.demo",
+    email: "buyer@breedela.demo",
     passwordHash: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
     firstName: "Emma",
     lastName: "Johnson",

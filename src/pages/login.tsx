@@ -36,7 +36,7 @@ export default function LoginPage() {
       <div className="max-w-md mx-auto px-4 py-16">
         <div className="bg-card rounded-2xl border border-border p-8">
           <h1 className="font-display text-2xl font-bold text-center mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground text-center mb-6">Log in to your PawMarket account</p>
+          <p className="text-muted-foreground text-center mb-6">Log in to your Breedela account</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>

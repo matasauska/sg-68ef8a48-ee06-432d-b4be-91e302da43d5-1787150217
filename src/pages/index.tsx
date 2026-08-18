@@ -246,7 +246,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="font-display font-semibold mb-4">PawMarket</h4>
+              <h4 className="font-display font-semibold mb-4">Breedela</h4>
               <p className="text-sm text-background/70">Trusted marketplace for pedigree animals.</p>
             </div>
             <div>
@@ -273,7 +273,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-background/10 text-center text-sm text-background/50">
-            © 2026 PawMarket. All rights reserved.
+            © 2026 Breedela. All rights reserved.
           </div>
         </div>
       </footer>

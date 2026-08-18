@@ -2,7 +2,7 @@
   "users": [
     {
       "id": "2f276bfc-d40e-46cd-ba9c-b9b62be3bd48",
-      "email": "admin@pawmarket.demo",
+      "email": "admin@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Admin",
       "lastName": "User",
@@ -13,7 +13,7 @@
     },
     {
       "id": "d4532212-4953-4fe0-8826-488b011024aa",
-      "email": "breeder1@pawmarket.demo",
+      "email": "breeder1@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Maria",
       "lastName": "Schneider",
@@ -25,7 +25,7 @@
     },
     {
       "id": "6c673ff2-98cd-407d-81e2-c0ba77711db9",
-      "email": "breeder2@pawmarket.demo",
+      "email": "breeder2@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Jan",
       "lastName": "Van Dijk",
@@ -37,7 +37,7 @@
     },
     {
       "id": "ba1f2ff0-1c36-4c02-a58d-d175598ff3ef",
-      "email": "buyer@pawmarket.demo",
+      "email": "buyer@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Emma",
       "lastName": "Johnson",

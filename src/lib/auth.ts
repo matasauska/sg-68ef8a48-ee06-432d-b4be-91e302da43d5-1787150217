@@ -3,7 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import type { User } from "@/types";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "pawmarket-local-secret-key-change-in-production"
+  process.env.JWT_SECRET || "breedela-local-secret-key-change-in-production"
 );
 
 function serializeCookie(name: string, value: string, options: Record<string, any>): string {

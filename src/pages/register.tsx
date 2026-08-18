@@ -41,7 +41,7 @@ export default function RegisterPage() {
       <div className="max-w-md mx-auto px-4 py-12">
         <div className="bg-card rounded-2xl border border-border p-8">
           <h1 className="font-display text-2xl font-bold text-center mb-2">Create Account</h1>
-          <p className="text-muted-foreground text-center mb-6">Join PawMarket to find your new companion</p>
+          <p className="text-muted-foreground text-center mb-6">Join Breedela to find your new companion</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
