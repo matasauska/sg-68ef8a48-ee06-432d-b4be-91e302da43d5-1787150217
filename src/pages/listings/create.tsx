@@ -18,7 +18,7 @@ export default function CreateListingPage() {
   const [step, setStep] = useState(1);
   const [animalTypes, setAnimalTypes] = useState<any[]>([]);
   const [breeds, setBreeds] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     animalType: "",
@@ -69,7 +69,7 @@ export default function CreateListingPage() {
   };
 
   const submit = async () => {
-    setLoading(true);
+    setSubmitting(true);
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,7 +78,7 @@ export default function CreateListingPage() {
         price: Number(form.price),
       }),
     });
-    setLoading(false);
+    setSubmitting(false);
     if (res.ok) {
       toast({ title: "Listing submitted for moderation" });
       router.push("/dashboard");
@@ -234,8 +234,8 @@ export default function CreateListingPage() {
               Next <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
-            <Button onClick={submit} disabled={loading}>
-              {loading ? "Submitting..." : "Submit Listing"}
+            <Button onClick={submit} disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Listing"}
             </Button>
           )}
         </div>
