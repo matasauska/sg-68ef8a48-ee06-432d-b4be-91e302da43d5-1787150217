@@ -85,9 +85,9 @@ export function ListingCard({ listing }: { listing: Listing }) {
             )}
           </div>
           <div className="flex gap-2 mt-2">
-            {listing.vaccinated && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700">Vaccinated</span>}
-            {listing.microchipped && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Chipped</span>}
-            {listing.pedigree && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Pedigree</span>}
+            {listing.vaccinated && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Vaccinated</span>}
+            {listing.microchipped && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Chipped</span>}
+            {listing.pedigree && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Pedigree</span>}
           </div>
         </div>
       </div>
