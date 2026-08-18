@@ -42,13 +42,13 @@ export default function MessagesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-medium truncate">{c.listingTitle || "Conversation"}</p>
-                      {c.unreadCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-medium">{c.unreadCount}</span>
+                      {c.unread && c.unread > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-medium">{c.unread}</span>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground truncate mt-1">{c.lastMessageContent}</p>
+                    <p className="text-sm text-muted-foreground truncate mt-1">{c.lastMessage?.content || "No messages yet"}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0 ml-4">{new Date(c.updatedAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-muted-foreground shrink-0 ml-4">{new Date(c.lastMessageAt).toLocaleDateString()}</span>
                 </div>
               </Link>
             ))}

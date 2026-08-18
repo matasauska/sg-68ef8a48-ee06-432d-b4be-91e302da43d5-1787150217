@@ -99,7 +99,7 @@ export default function DashboardPage() {
                   <Star className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{breederProfile?.totalReviews || 0}</p>
+                  <p className="text-2xl font-bold">{reviews?.length || 0}</p>
                   <p className="text-sm text-muted-foreground">Reviews</p>
                 </div>
               </div>
@@ -165,9 +165,9 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{c.listingTitle || "Conversation"}</p>
-                      <p className="text-sm text-muted-foreground">{c.lastMessageContent}</p>
+                      <p className="text-sm text-muted-foreground">{c.lastMessage?.content || "No messages yet"}</p>
                     </div>
-                    <span className="text-xs text-muted-foreground">{new Date(c.updatedAt).toLocaleDateString()}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(c.lastMessageAt).toLocaleDateString()}</span>
                   </div>
                 </Link>
               ))}
