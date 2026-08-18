@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDb, generateId } from "@/lib/db";
-import { requireAuth } from "@/lib/api-helpers";
+import { requireAuth, requireRole } from "@/lib/api-helpers";
+import type { Listing } from "@/types";
 import { z } from "zod";
 
 const createSchema = z.object({
