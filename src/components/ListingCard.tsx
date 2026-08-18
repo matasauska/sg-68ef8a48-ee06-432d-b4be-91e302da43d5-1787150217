@@ -57,7 +57,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </div>
           <button
             onClick={toggleFavorite}
-            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+            className="absolute top-3 right-3 p-2 rounded-full bg-card/80 backdrop-blur-sm hover:bg-card transition-colors"
           >
             <Heart className={`w-4 h-4 ${favorited ? "text-red-500 fill-red-500" : "text-foreground"}`} />
           </button>

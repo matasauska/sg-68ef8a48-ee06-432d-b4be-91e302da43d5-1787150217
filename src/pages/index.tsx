@@ -64,7 +64,7 @@ export default function HomePage() {
               Discover trusted breeders and pedigree animals in one place.
             </p>
             
-            <div className="mt-8 bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-border">
+            <div className="mt-8 bg-card rounded-2xl shadow-lg p-4 md:p-6 border border-border">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                 <Select value={searchType} onValueChange={setSearchType}>
                   <SelectTrigger className="bg-muted border-0"><SelectValue placeholder="Animal Type" /></SelectTrigger>
