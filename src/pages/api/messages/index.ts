@@ -17,7 +17,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const unread = db.data.messages.filter(
           (m) => m.conversationId === c.id && m.senderId !== user.id && !m.read
         ).length;
-        return { ...c, lastMessage, unread };
+        const otherId = c.participantIds.find((id) => id !== user.id);
+        const otherUser = otherId ? db.data.users.find((u) => u.id === otherId) : null;
+        const otherParticipantName = otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : "Unknown";
+        return { ...c, lastMessage, unread, otherParticipantName };
       });
 
       res.status(200).json({ conversations: enriched });

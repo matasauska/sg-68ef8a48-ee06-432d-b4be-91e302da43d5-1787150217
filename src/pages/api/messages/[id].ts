@@ -28,7 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       await db.write();
 
-      res.status(200).json({ messages, conversation });
+      const otherId = conversation.participantIds.find((pid) => pid !== user.id);
+      const otherUser = otherId ? db.data.users.find((u) => u.id === otherId) : null;
+      const otherParticipantName = otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : "Unknown";
+
+      res.status(200).json({ messages, conversation: { ...conversation, otherParticipantName } });
     })(req, res);
   }
 
