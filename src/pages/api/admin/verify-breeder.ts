@@ -13,7 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!breeder) return res.status(404).json({ message: "Breeder not found" });
 
     breeder.verified = verified;
-    breeder.verifiedAt = verified ? new Date().toISOString() : undefined;
     await db.write();
 
     res.status(200).json({ breeder });

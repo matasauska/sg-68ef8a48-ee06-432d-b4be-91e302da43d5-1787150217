@@ -1,11 +1,30 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
-import { serialize, parse } from "cookie";
 import type { User } from "@/types";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "pawmarket-local-secret-key-change-in-production"
 );
+
+function serializeCookie(name: string, value: string, options: Record<string, any>): string {
+  let cookie = `${name}=${encodeURIComponent(value)}`;
+  if (options.httpOnly) cookie += "; HttpOnly";
+  if (options.secure) cookie += "; Secure";
+  if (options.sameSite) cookie += `; SameSite=${options.sameSite}`;
+  if (options.path) cookie += `; Path=${options.path}`;
+  if (options.maxAge !== undefined) cookie += `; Max-Age=${options.maxAge}`;
+  return cookie;
+}
+
+function parseCookieHeader(cookieHeader: string): Record<string, string> {
+  const cookies: Record<string, string> = {};
+  if (!cookieHeader) return cookies;
+  cookieHeader.split(";").forEach((cookie) => {
+    const [name, ...rest] = cookie.trim().split("=");
+    cookies[name] = decodeURIComponent(rest.join("="));
+  });
+  return cookies;
+}
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
@@ -47,7 +66,7 @@ export async function verifyToken(token: string) {
 }
 
 export function setAuthCookie(token: string): string {
-  return serialize("auth-token", token, {
+  return serializeCookie("auth-token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -57,7 +76,7 @@ export function setAuthCookie(token: string): string {
 }
 
 export function clearAuthCookie(): string {
-  return serialize("auth-token", "", {
+  return serializeCookie("auth-token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -67,7 +86,7 @@ export function clearAuthCookie(): string {
 }
 
 export function parseAuthCookie(cookieHeader: string): string | undefined {
-  const cookies = parse(cookieHeader);
+  const cookies = parseCookieHeader(cookieHeader);
   return cookies["auth-token"];
 }
 

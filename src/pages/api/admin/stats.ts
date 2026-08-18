@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       totalUsers: db.data.users.length,
       totalBreeders: db.data.users.filter(u => u.role === "breeder").length,
       totalListings: db.data.listings.length,
-      activeListings: db.data.listings.filter(l => l.status === "active").length,
+      activeListings: db.data.listings.filter(l => l.status === "approved").length,
       soldListings: db.data.listings.filter(l => l.status === "sold").length,
       pendingListings: db.data.listings.filter(l => l.status === "pending").length,
       verifiedBreeders: db.data.breederProfiles.filter(b => b.verified).length,

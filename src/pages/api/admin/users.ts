@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { id, suspended } = req.body;
       const user = db.data.users.find(u => u.id === id);
       if (!user) return res.status(404).json({ message: "Not found" });
-      user.suspended = suspended;
+      user.isSuspended = suspended;
       await db.write();
       res.status(200).json({ message: "Updated" });
     })(req, res);

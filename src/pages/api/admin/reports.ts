@@ -8,11 +8,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const db = await getDb();
       const reports = db.data.reports.map(r => {
         const reporter = db.data.users.find(u => u.id === r.reporterId);
-        const listing = db.data.listings.find(l => l.id === r.listingId);
+        const target = db.data.listings.find(l => l.id === r.targetId);
         return {
           ...r,
           reporterName: reporter ? `${reporter.firstName} ${reporter.lastName}` : "Unknown",
-          listingTitle: listing?.title || "Unknown",
+          targetTitle: target?.title || "Unknown",
         };
       });
       res.status(200).json({ reports });

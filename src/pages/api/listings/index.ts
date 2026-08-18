@@ -81,13 +81,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const breederVerified = breederProfile?.verified || false;
 
       const now = new Date().toISOString();
-      const listing = {
+      const listing: Listing = {
         id: generateId(),
         breederId: breederProfile?.id || user.id,
         breederName,
         breederVerified,
-        ...data,
-        status: "pending" as const,
+        title: data.title,
+        animalType: data.animalType,
+        breed: data.breed,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+        price: data.price,
+        location: data.location,
+        description: data.description,
+        photos: data.photos,
+        videoUrl: data.videoUrl,
+        vaccinated: data.vaccinated,
+        microchipped: data.microchipped,
+        pedigree: data.pedigree,
+        healthInfo: data.healthInfo,
+        parentsInfo: data.parentsInfo,
+        status: "pending",
         isBoosted: false,
         isPremium: false,
         viewCount: 0,

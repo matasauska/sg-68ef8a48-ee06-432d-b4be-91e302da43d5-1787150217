@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDb, generateId } from "@/lib/db";
-import { requireAuth, requireRole } from "@/lib/api-helpers";
+import { requireAuth } from "@/lib/api-helpers";
 import type { BreederProfile } from "@/types";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const db = await getDb();
-    return res.status(200).json({ breeders: db.data.breederProfiles });
+    return res.status(200).json({ breederProfiles: db.data.breederProfiles });
   }
 
   if (req.method === "POST") {
@@ -21,18 +21,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: "Profile already exists" });
       }
 
+      const now = new Date().toISOString();
       const profile: BreederProfile = {
         id: generateId(),
         userId: user.id,
         kennelName: req.body.kennelName,
         about: req.body.about || "",
         location: req.body.location,
-        yearsExperience: req.body.yearsExperience || 0,
+        experienceYears: req.body.experienceYears || 0,
         breeds: req.body.breeds || [],
         website: req.body.website,
-        phone: req.body.phone,
         verified: false,
-        createdAt: new Date().toISOString(),
+        verificationRequested: false,
+        totalListings: 0,
+        createdAt: now,
+        updatedAt: now,
       };
 
       db.data.breederProfiles.push(profile);

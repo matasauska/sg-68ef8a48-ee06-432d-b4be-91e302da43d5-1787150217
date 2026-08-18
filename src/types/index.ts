@@ -53,6 +53,8 @@ export interface Listing {
   pedigreeDocs?: string[];
   healthInfo?: string;
   parentsInfo?: string;
+  neutered?: boolean;
+  pedigreeInfo?: string;
   status: "pending" | "approved" | "rejected" | "sold";
   moderationNote?: string;
   isBoosted: boolean;
@@ -76,6 +78,9 @@ export interface Conversation {
   listingTitle?: string;
   lastMessageAt: string;
   createdAt: string;
+  lastMessage?: Message;
+  unread?: number;
+  otherParticipantName?: string;
 }
 
 export interface Message {

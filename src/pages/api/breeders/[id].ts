@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const user = db.data.users.find(u => u.id === breeder.userId);
-  const listings = db.data.listings.filter(l => l.breederId === breeder.id && l.status === "active");
+  const listings = db.data.listings.filter(l => l.breederId === breeder.id && l.status === "approved");
   const reviews = db.data.reviews.filter(r => r.breederId === breeder.id);
 
   res.status(200).json({
