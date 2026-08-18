@@ -16,7 +16,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-white font-display font-bold text-sm">P</span>
+              <span className="text-primary-foreground font-display font-bold text-sm">B</span>
             </div>
             <span className="font-display font-semibold text-xl text-foreground">Breedela</span>
           </Link>
@@ -125,7 +125,7 @@ export function Header() {
           ) : (
             <>
               <Link href="/login" className="block px-3 py-2 rounded-md hover:bg-muted" onClick={() => setMobileOpen(false)}>Log In</Link>
-              <Link href="/register" className="block px-3 py-2 rounded-md bg-primary text-white" onClick={() => setMobileOpen(false)}>Register</Link>
+              <Link href="/register" className="block px-3 py-2 rounded-md bg-primary text-primary-foreground" onClick={() => setMobileOpen(false)}>Register</Link>
             </>
           )}
         </div>
