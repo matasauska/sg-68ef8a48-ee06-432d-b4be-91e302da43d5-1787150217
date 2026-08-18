@@ -13,7 +13,7 @@ import { ArrowRight, ArrowLeft, Camera } from "lucide-react";
 
 export default function CreateListingPage() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [animalTypes, setAnimalTypes] = useState<any[]>([]);
@@ -39,9 +39,9 @@ export default function CreateListingPage() {
   });
 
   useEffect(() => {
-    if (!isLoading && !user) router.push("/login");
-    if (!isLoading && user && user.role === "buyer") router.push("/");
-  }, [user, isLoading, router]);
+    if (!loading && !user) router.push("/login");
+    if (!loading && user && user.role === "buyer") router.push("/");
+  }, [user, loading, router]);
 
   useEffect(() => {
     fetch("/api/animal-types").then(r => r.json()).then(d => setAnimalTypes(d.animalTypes || []));
@@ -87,7 +87,7 @@ export default function CreateListingPage() {
     }
   };
 
-  if (isLoading || !user) return null;
+  if (loading || !user) return null;
 
   const steps = [
     { title: "Animal Type", content: (

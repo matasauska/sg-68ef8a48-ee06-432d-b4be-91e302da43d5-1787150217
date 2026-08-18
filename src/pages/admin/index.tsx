@@ -9,16 +9,16 @@ import { Shield, Users, List, CheckCircle, AlertTriangle, Star, DollarSign } fro
 
 export default function AdminPage() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<any>(null);
   const [pendingListings, setPendingListings] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!isLoading && !user) router.push("/login");
-    if (!isLoading && user && user.role !== "admin") router.push("/");
-  }, [user, isLoading, router]);
+    if (!loading && !user) router.push("/login");
+    if (!loading && user && user.role !== "admin") router.push("/");
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (user?.role !== "admin") return;
@@ -63,7 +63,7 @@ export default function AdminPage() {
     }
   };
 
-  if (isLoading || !user || user.role !== "admin") return null;
+  if (loading || !user || user.role !== "admin") return null;
 
   return (
     <div className="min-h-screen bg-background">
