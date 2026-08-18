@@ -10,7 +10,7 @@ export default function MessagesPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
@@ -18,10 +18,10 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!user) return;
-    setLoading(true);
+    setPageLoading(true);
     fetch("/api/messages").then(r => r.json()).then(d => {
       setConversations(d.conversations || []);
-      setLoading(false);
+      setPageLoading(false);
     });
 
     // Handle ?breeder= param for starting new conversation
@@ -41,7 +41,7 @@ export default function MessagesPage() {
     }
   }, [user, router.query.breeder]);
 
-  if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
+  if (pageLoading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
   if (!user) return null;
 
   return (
