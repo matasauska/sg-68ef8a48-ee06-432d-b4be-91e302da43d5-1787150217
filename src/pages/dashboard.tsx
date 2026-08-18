@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const [favorites, setFavorites] = useState<Listing[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [breederProfile, setBreederProfile] = useState<BreederProfile | null>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (loading) return;
@@ -31,6 +32,7 @@ export default function DashboardPage() {
         const mine = d.breederProfiles?.find((p: BreederProfile) => p.userId === user.id);
         setBreederProfile(mine || null);
       });
+      fetch(`/api/breeders/${user.id}`).then(r => r.json()).then(d => setReviews(d.reviews || [])).catch(() => {});
     }
   }, [user, loading, router]);
 
