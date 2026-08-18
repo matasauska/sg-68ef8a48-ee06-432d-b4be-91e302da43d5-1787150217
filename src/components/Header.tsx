@@ -15,8 +15,8 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-sm">B</span>
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <img src="/logo.jpg" alt="Breedela" className="w-full h-full object-cover" />
             </div>
             <span className="font-display font-semibold text-xl text-foreground">Breedela</span>
           </Link>

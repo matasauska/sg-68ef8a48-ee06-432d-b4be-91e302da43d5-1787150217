@@ -1,56 +1,56 @@
 {
   "users": [
     {
-      "id": "2f276bfc-d40e-46cd-ba9c-b9b62be3bd48",
+      "id": "e45a8405-fdb1-43b1-96cc-623bdb2db34f",
       "email": "admin@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Admin",
       "lastName": "User",
       "role": "admin",
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z",
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z",
       "isSuspended": false
     },
     {
-      "id": "d4532212-4953-4fe0-8826-488b011024aa",
+      "id": "57913070-c82f-442e-9c48-c8d5f2a58dfd",
       "email": "breeder1@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Maria",
       "lastName": "Schneider",
       "role": "breeder",
       "phone": "+49 89 12345678",
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z",
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z",
       "isSuspended": false
     },
     {
-      "id": "6c673ff2-98cd-407d-81e2-c0ba77711db9",
+      "id": "6680593d-130f-4034-8e72-7d03b3647c36",
       "email": "breeder2@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Jan",
       "lastName": "Van Dijk",
       "role": "breeder",
       "phone": "+31 20 87654321",
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z",
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z",
       "isSuspended": false
     },
     {
-      "id": "ba1f2ff0-1c36-4c02-a58d-d175598ff3ef",
+      "id": "b4ed8b4d-38f2-4da0-8f8c-4b01f63783f8",
       "email": "buyer@breedela.demo",
       "passwordHash": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
       "firstName": "Emma",
       "lastName": "Johnson",
       "role": "buyer",
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z",
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z",
       "isSuspended": false
     }
   ],
   "breederProfiles": [
     {
-      "id": "81363401-4bdb-4b1b-9a66-7634f8c63ad7",
-      "userId": "d4532212-4953-4fe0-8826-488b011024aa",
+      "id": "1e83c671-b4bc-4392-9dbe-8fba8bee6ca1",
+      "userId": "57913070-c82f-442e-9c48-c8d5f2a58dfd",
       "kennelName": "Greenfield Retrievers",
       "location": "Munich, Germany",
       "about": "Family-run kennel specializing in healthy, well-socialized retrievers with full pedigree documentation.",
@@ -62,12 +62,12 @@
       "verified": true,
       "verificationRequested": false,
       "totalListings": 2,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     },
     {
-      "id": "1519f4e8-4ac1-44f3-8518-23a53721cf19",
-      "userId": "6c673ff2-98cd-407d-81e2-c0ba77711db9",
+      "id": "d4979f59-4c15-4a1b-a7ee-9778a70ff68e",
+      "userId": "6680593d-130f-4034-8e72-7d03b3647c36",
       "kennelName": "Royal Maine Coons",
       "location": "Amsterdam, Netherlands",
       "about": "Champion bloodline Maine Coons raised in a home environment with full health testing.",
@@ -79,14 +79,14 @@
       "verified": true,
       "verificationRequested": false,
       "totalListings": 2,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     }
   ],
   "listings": [
     {
-      "id": "c2a1eac3-ec3d-492d-b0b3-7239e2dfed4f",
-      "breederId": "81363401-4bdb-4b1b-9a66-7634f8c63ad7",
+      "id": "48918f92-f5d2-42ba-aa37-5e82e2ea866d",
+      "breederId": "1e83c671-b4bc-4392-9dbe-8fba8bee6ca1",
       "breederName": "Greenfield Retrievers",
       "breederVerified": true,
       "title": "Max - Golden Retriever Puppy",
@@ -109,12 +109,12 @@
       "isBoosted": false,
       "isPremium": true,
       "viewCount": 245,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     },
     {
-      "id": "82dd2e15-1de9-45e1-8da1-2c51492869a8",
-      "breederId": "81363401-4bdb-4b1b-9a66-7634f8c63ad7",
+      "id": "53c5ad44-383d-441b-9e24-9d99e1dc947c",
+      "breederId": "1e83c671-b4bc-4392-9dbe-8fba8bee6ca1",
       "breederName": "Greenfield Retrievers",
       "breederVerified": true,
       "title": "Charlie - Labrador Retriever",
@@ -136,13 +136,13 @@
       "status": "approved",
       "isBoosted": true,
       "isPremium": false,
-      "viewCount": 193,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "viewCount": 189,
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     },
     {
-      "id": "86eb38af-303d-4574-8e34-f8bf3a58ef84",
-      "breederId": "1519f4e8-4ac1-44f3-8518-23a53721cf19",
+      "id": "92365c2e-e811-4a0d-b3e4-32563359483a",
+      "breederId": "d4979f59-4c15-4a1b-a7ee-9778a70ff68e",
       "breederName": "Royal Maine Coons",
       "breederVerified": true,
       "title": "Luna - Silver Tabby Maine Coon",
@@ -165,12 +165,12 @@
       "isBoosted": true,
       "isPremium": false,
       "viewCount": 312,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     },
     {
-      "id": "d9730d07-5a79-493e-b8d9-f29d4e10779a",
-      "breederId": "1519f4e8-4ac1-44f3-8518-23a53721cf19",
+      "id": "b7a873af-c8c3-4fa3-b6a8-a97660a0e509",
+      "breederId": "d4979f59-4c15-4a1b-a7ee-9778a70ff68e",
       "breederName": "Royal Maine Coons",
       "breederVerified": true,
       "title": "Nala - British Shorthair",
@@ -193,8 +193,8 @@
       "isBoosted": false,
       "isPremium": false,
       "viewCount": 156,
-      "createdAt": "2026-08-18T12:10:39.503Z",
-      "updatedAt": "2026-08-18T12:10:39.503Z"
+      "createdAt": "2026-08-18T13:03:53.295Z",
+      "updatedAt": "2026-08-18T13:03:53.295Z"
     }
   ],
   "favorites": [],
