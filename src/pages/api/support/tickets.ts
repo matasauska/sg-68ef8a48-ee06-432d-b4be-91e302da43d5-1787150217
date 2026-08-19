@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     const { userId, admin } = req.query;
     let query = supabase.from("support_tickets").select("*").order("created_at", { ascending: false });
-    if (!admin && userId) query = query.eq("user_id", userId);
+    if (!admin && userId) query = query.eq("user_id", String(userId));
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ tickets: data });

@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data, error } = await supabase
       .from("support_ticket_messages")
       .select("*")
-      .eq("ticket_id", ticketId)
+      .eq("ticket_id", String(ticketId))
       .order("created_at", { ascending: true });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ messages: data });
