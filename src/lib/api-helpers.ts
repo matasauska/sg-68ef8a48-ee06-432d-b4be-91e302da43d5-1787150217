@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { verifyToken, parseAuthCookie } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export async function getCurrentUser(req: NextApiRequest) {
   const cookieHeader = req.headers.cookie || "";
@@ -10,11 +10,29 @@ export async function getCurrentUser(req: NextApiRequest) {
   const payload = await verifyToken(token);
   if (!payload) return null;
 
-  const db = await getDb();
-  const user = db.data.users.find((u) => u.id === payload.userId);
-  if (!user || user.isSuspended) return null;
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("*")
+    .eq("id", payload.userId)
+    .single();
 
-  return user;
+  if (!profile || profile.is_suspended) return null;
+
+  return {
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    fullName: profile.full_name,
+    role: profile.role,
+    breederVerified: profile.breeder_verified || profile.is_verified_breeder,
+    isAdmin: profile.role === "admin",
+    phone: profile.phone,
+    location: profile.location,
+    avatarUrl: profile.avatar_url,
+    createdAt: profile.created_at,
+    updatedAt: profile.updated_at,
+  };
 }
 
 export function requireAuth(handler: (req: NextApiRequest, res: NextApiResponse, user: Awaited<ReturnType<typeof getCurrentUser>>) => Promise<void>) {

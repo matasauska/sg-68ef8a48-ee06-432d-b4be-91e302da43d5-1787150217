@@ -180,6 +180,41 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_message_at: string | null
+          listing_id: string | null
+          listing_title: string | null
+          participant_ids: string[]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          listing_id?: string | null
+          listing_title?: string | null
+          participant_ids?: string[]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          listing_id?: string | null
+          listing_title?: string | null
+          participant_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           animal_type: string
@@ -187,6 +222,8 @@ export type Database = {
           breed: string
           breeder_id: string
           breeder_info: string | null
+          breeder_name: string | null
+          breeder_verified: boolean | null
           created_at: string | null
           date_of_birth: string | null
           description: string | null
@@ -198,6 +235,7 @@ export type Database = {
           is_featured: boolean
           location: string
           microchip_number: string | null
+          neutered: boolean | null
           parents_info: string | null
           photos: string[] | null
           price: number
@@ -214,6 +252,8 @@ export type Database = {
           breed: string
           breeder_id: string
           breeder_info?: string | null
+          breeder_name?: string | null
+          breeder_verified?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
           description?: string | null
@@ -225,6 +265,7 @@ export type Database = {
           is_featured?: boolean
           location: string
           microchip_number?: string | null
+          neutered?: boolean | null
           parents_info?: string | null
           photos?: string[] | null
           price: number
@@ -241,6 +282,8 @@ export type Database = {
           breed?: string
           breeder_id?: string
           breeder_info?: string | null
+          breeder_name?: string | null
+          breeder_verified?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
           description?: string | null
@@ -252,6 +295,7 @@ export type Database = {
           is_featured?: boolean
           location?: string
           microchip_number?: string | null
+          neutered?: boolean | null
           parents_info?: string | null
           photos?: string[] | null
           price?: number
@@ -324,6 +368,95 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          link: string | null
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          id: string
+          listing_id: string | null
+          status: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          listing_id?: string | null
+          status?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          listing_id?: string | null
+          status?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -335,9 +468,11 @@ export type Database = {
           full_name: string | null
           id: string
           is_admin: boolean | null
+          is_suspended: boolean | null
           is_verified_breeder: boolean
           last_name: string | null
           location: string | null
+          password_hash: string | null
           phone: string | null
           role: string | null
           updated_at: string | null
@@ -352,9 +487,11 @@ export type Database = {
           full_name?: string | null
           id: string
           is_admin?: boolean | null
+          is_suspended?: boolean | null
           is_verified_breeder?: boolean
           last_name?: string | null
           location?: string | null
+          password_hash?: string | null
           phone?: string | null
           role?: string | null
           updated_at?: string | null
@@ -369,9 +506,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_admin?: boolean | null
+          is_suspended?: boolean | null
           is_verified_breeder?: boolean
           last_name?: string | null
           location?: string | null
+          password_hash?: string | null
           phone?: string | null
           role?: string | null
           updated_at?: string | null
@@ -413,6 +552,61 @@ export type Database = {
           {
             foreignKeyName: "reports_reporter_id_fkey"
             columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          breeder_id: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          listing_id: string | null
+          rating: number
+          reviewer_id: string
+          reviewer_name: string | null
+        }
+        Insert: {
+          breeder_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          listing_id?: string | null
+          rating: number
+          reviewer_id: string
+          reviewer_name?: string | null
+        }
+        Update: {
+          breeder_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          listing_id?: string | null
+          rating?: number
+          reviewer_id?: string
+          reviewer_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
