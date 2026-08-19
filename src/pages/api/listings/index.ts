@@ -105,6 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         status: "pending",
         isBoosted: false,
         isPremium: false,
+        featured: false,
         viewCount: 0,
         createdAt: now,
         updatedAt: now,
