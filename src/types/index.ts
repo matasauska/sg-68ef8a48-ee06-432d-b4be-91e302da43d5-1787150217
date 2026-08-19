@@ -59,6 +59,7 @@ export interface Listing {
   moderationNote?: string;
   isBoosted: boolean;
   isPremium: boolean;
+  featured: boolean;
   viewCount: number;
   createdAt: string;
   updatedAt: string;
