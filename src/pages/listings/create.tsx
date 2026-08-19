@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, ArrowLeft, Camera } from "lucide-react";
 
 export default function CreateListingPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [animalTypes, setAnimalTypes] = useState<any[]>([]);
@@ -43,10 +45,9 @@ export default function CreateListingPage() {
     if (!loading && !user) router.push("/login");
     if (!loading && user && user.role === "buyer") router.push("/");
     if (!loading && user && user.role === "breeder") {
-      // Check verification status
       fetch("/api/verification").then(r => r.json()).then(d => {
         if (!d || d.status !== "verified") {
-          toast({ title: "Breeder verification required", description: "Please complete verification before posting listings.", variant: "destructive" });
+          toast({ title: t("dashboard.verificationRequired"), description: t("dashboard.verificationRequiredDesc"), variant: "destructive" });
           router.push("/verification");
         } else {
           setVerified(true);
@@ -85,53 +86,47 @@ export default function CreateListingPage() {
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        price: Number(form.price),
-      }),
+      body: JSON.stringify({ ...form, price: Number(form.price) }),
     });
     setSubmitting(false);
     if (res.ok) {
-      toast({ title: "Listing submitted for moderation" });
+      toast({ title: t("listings.submitted") });
       router.push("/dashboard");
     } else {
-      toast({ title: "Failed to create listing", variant: "destructive" });
+      toast({ title: t("errors.createListingFailed"), variant: "destructive" });
     }
   };
 
   if (loading || !user || verified === null) return null;
 
   const steps = [
-    { title: "Animal Type", content: (
+    { title: t("listings.stepType"), content: (
       <div className="space-y-4">
-        <Label>Select Animal Type</Label>
+        <Label>{t("listings.selectType")}</Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {animalTypes.map(t => (
-            <button
-              key={t.id}
-              onClick={() => update("animalType", t.id)}
-              className={`p-4 rounded-xl border-2 text-center transition-colors ${form.animalType === t.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}
-            >
-              <p className="font-medium">{t.name}</p>
+          {animalTypes.map(type => (
+            <button key={type.id} onClick={() => update("animalType", type.id)}
+              className={`p-4 rounded-xl border-2 text-center transition-colors ${form.animalType === type.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"}`}>
+              <p className="font-medium">{type.name}</p>
             </button>
           ))}
         </div>
       </div>
     )},
-    { title: "Breed", content: (
+    { title: t("listings.stepBreed"), content: (
       <div className="space-y-4">
-        <Label>Select Breed</Label>
+        <Label>{t("listings.selectBreed")}</Label>
         <Select value={form.breed} onValueChange={v => update("breed", v)}>
-          <SelectTrigger><SelectValue placeholder="Choose breed" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t("listings.chooseBreed")} /></SelectTrigger>
           <SelectContent>
             {breeds.map(b => <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
     )},
-    { title: "Photos", content: (
+    { title: t("listings.stepPhotos"), content: (
       <div className="space-y-4">
-        <Label>Photos</Label>
+        <Label>{t("listings.photos")}</Label>
         <div className="grid grid-cols-3 gap-3">
           {form.photos.map((p, i) => (
             <div key={i} className="aspect-square rounded-xl bg-muted overflow-hidden">
@@ -140,88 +135,88 @@ export default function CreateListingPage() {
           ))}
           <button onClick={addPhoto} className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:border-primary/30 transition-colors">
             <Camera className="w-6 h-6 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Add Photo</span>
+            <span className="text-xs text-muted-foreground">{t("listings.addPhoto")}</span>
           </button>
         </div>
       </div>
     )},
-    { title: "Details", content: (
+    { title: t("listings.stepDetails"), content: (
       <div className="space-y-4">
         <div>
-          <Label>Title</Label>
-          <Input value={form.title} onChange={e => update("title", e.target.value)} placeholder="e.g. Max - Golden Retriever Puppy" />
+          <Label>{t("listings.title")}</Label>
+          <Input value={form.title} onChange={e => update("title", e.target.value)} placeholder={t("listings.titlePlaceholder")} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Gender</Label>
+            <Label>{t("listings.gender")}</Label>
             <Select value={form.gender} onValueChange={v => update("gender", v as any)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Male">{t("listings.male")}</SelectItem>
+                <SelectItem value="Female">{t("listings.female")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>Date of Birth</Label>
+            <Label>{t("listings.dateOfBirth")}</Label>
             <Input type="date" value={form.dateOfBirth} onChange={e => update("dateOfBirth", e.target.value)} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Price (€)</Label>
+            <Label>{t("listings.price")}</Label>
             <Input type="number" value={form.price} onChange={e => update("price", e.target.value)} />
           </div>
           <div>
-            <Label>Location</Label>
-            <Input value={form.location} onChange={e => update("location", e.target.value)} placeholder="City, Country" />
+            <Label>{t("listings.location")}</Label>
+            <Input value={form.location} onChange={e => update("location", e.target.value)} placeholder={t("hero.location")} />
           </div>
         </div>
         <div>
-          <Label>Description</Label>
+          <Label>{t("listings.description")}</Label>
           <Textarea value={form.description} onChange={e => update("description", e.target.value)} rows={4} />
         </div>
       </div>
     )},
-    { title: "Health", content: (
+    { title: t("listings.stepHealth"), content: (
       <div className="space-y-4">
         <div className="flex gap-4">
           <label className="flex items-center gap-2">
             <Checkbox checked={form.vaccinated} onCheckedChange={v => update("vaccinated", v)} />
-            <span>Vaccinated</span>
+            <span>{t("filters.vaccinated")}</span>
           </label>
           <label className="flex items-center gap-2">
             <Checkbox checked={form.microchipped} onCheckedChange={v => update("microchipped", v)} />
-            <span>Microchipped</span>
+            <span>{t("filters.microchipped")}</span>
           </label>
           <label className="flex items-center gap-2">
             <Checkbox checked={form.pedigree} onCheckedChange={v => update("pedigree", v)} />
-            <span>Pedigree</span>
+            <span>{t("filters.pedigreeDocs")}</span>
           </label>
         </div>
         <div>
-          <Label>Health Information</Label>
+          <Label>{t("listings.healthInfo")}</Label>
           <Textarea value={form.healthInfo} onChange={e => update("healthInfo", e.target.value)} rows={3} />
         </div>
         <div>
-          <Label>Parents Information</Label>
+          <Label>{t("listings.parentsInfo")}</Label>
           <Textarea value={form.parentsInfo} onChange={e => update("parentsInfo", e.target.value)} rows={3} />
         </div>
       </div>
     )},
-    { title: "Preview", content: (
+    { title: t("listings.stepPreview"), content: (
       <div className="space-y-4">
         <div className="bg-card rounded-2xl border border-border p-6">
-          <h3 className="font-display text-xl font-bold">{form.title || "Untitled Listing"}</h3>
+          <h3 className="font-display text-xl font-bold">{form.title || t("listings.untitled")}</h3>
           <p className="text-muted-foreground">{form.breed} · {form.gender} · €{form.price}</p>
           <p className="mt-2">{form.description}</p>
           <div className="flex gap-2 mt-3">
-            {form.vaccinated && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Vaccinated</span>}
-            {form.microchipped && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Microchipped</span>}
-            {form.pedigree && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">Pedigree</span>}
+            {form.vaccinated && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{t("filters.vaccinated")}</span>}
+            {form.microchipped && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{t("filters.microchipped")}</span>}
+            {form.pedigree && <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{t("filters.pedigreeDocs")}</span>}
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">Your listing will be submitted for moderation before going public.</p>
+        <p className="text-sm text-muted-foreground">{t("listings.moderationNote")}</p>
       </div>
     )},
   ];
@@ -230,8 +225,8 @@ export default function CreateListingPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl font-bold mb-2">Post a Listing</h1>
-        <p className="text-muted-foreground mb-6">Step {step} of {steps.length}: {steps[step - 1].title}</p>
+        <h1 className="font-display text-2xl font-bold mb-2">{t("nav.postListing")}</h1>
+        <p className="text-muted-foreground mb-6">{t("common.step")} {step} {t("common.of")} {steps.length}: {steps[step - 1].title}</p>
 
         <div className="bg-card rounded-2xl border border-border p-6 mb-6">
           {steps[step - 1].content}
@@ -239,15 +234,15 @@ export default function CreateListingPage() {
 
         <div className="flex justify-between">
           <Button variant="outline" onClick={() => setStep(Math.max(1, step - 1))} disabled={step === 1}>
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            <ArrowLeft className="w-4 h-4 mr-1" /> {t("common.back")}
           </Button>
           {step < steps.length ? (
-            <Button onClick={() => setStep(step + 1)} disabled={step === 1 && !form.animalType || step === 2 && !form.breed}>
-              Next <ArrowRight className="w-4 h-4 ml-1" />
+            <Button onClick={() => setStep(step + 1)} disabled={(step === 1 && !form.animalType) || (step === 2 && !form.breed)}>
+              {t("common.next")} <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
             <Button onClick={submit} disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Listing"}
+              {submitting ? t("common.submitting") : t("listings.submitListing")}
             </Button>
           )}
         </div>

@@ -34,7 +34,7 @@ export default function SupportTicketsPage() {
 
   const createTicket = async () => {
     if (!subject.trim() || !description.trim()) {
-      toast({ title: "Please fill in all fields", variant: "destructive" });
+      toast({ title: t("help.fillAllFields"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -45,13 +45,13 @@ export default function SupportTicketsPage() {
     });
     setSubmitting(false);
     if (res.ok) {
-      toast({ title: "Ticket created successfully" });
+      toast({ title: t("help.ticketCreated") });
       setSubject("");
       setDescription("");
       setShowForm(false);
       loadTickets();
     } else {
-      toast({ title: "Failed to create ticket", variant: "destructive" });
+      toast({ title: t("help.ticketFailed"), variant: "destructive" });
     }
   };
 
@@ -85,27 +85,27 @@ export default function SupportTicketsPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display text-3xl font-bold flex items-center gap-2">
-            <Ticket className="w-7 h-7" /> Support Tickets
+            <Ticket className="w-7 h-7" /> {t("help.supportTickets")}
           </h1>
           <Button onClick={() => setShowForm(!showForm)}>
-            {showForm ? "Cancel" : "New Ticket"}
+            {showForm ? t("common.cancel") : t("help.newTicket")}
           </Button>
         </div>
 
         {showForm && (
           <div className="bg-card rounded-2xl border border-border p-6 mb-6">
-            <h2 className="font-medium mb-4">Create New Ticket</h2>
+            <h2 className="font-medium mb-4">{t("help.createTicket")}</h2>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Subject</label>
-                <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="What is your issue about?" />
+                <label className="text-sm font-medium mb-1 block">{t("help.subject")}</label>
+                <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder={t("help.subjectPlaceholder")} />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Description</label>
-                <Textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} placeholder="Describe your problem in detail..." />
+                <label className="text-sm font-medium mb-1 block">{t("help.description")}</label>
+                <Textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} placeholder={t("help.descriptionPlaceholder")} />
               </div>
               <Button onClick={createTicket} disabled={submitting}>
-                {submitting ? "Creating..." : "Submit Ticket"}
+                {submitting ? t("common.submitting") : t("help.submit")}
               </Button>
             </div>
           </div>
@@ -115,8 +115,8 @@ export default function SupportTicketsPage() {
           {tickets.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <Ticket className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No support tickets yet</p>
-              <p className="text-sm">Create a ticket if you need help</p>
+              <p>{t("help.noTickets")}</p>
+              <p className="text-sm">{t("help.createTicketPrompt")}</p>
             </div>
           )}
           {tickets.map(ticket => (
@@ -134,7 +134,7 @@ export default function SupportTicketsPage() {
                   </div>
                   <p className="text-sm text-muted-foreground">{ticket.description}</p>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Created {new Date(ticket.created_at).toLocaleDateString()}
+                    {t("help.created")} {new Date(ticket.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>

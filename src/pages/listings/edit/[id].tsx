@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import type { Listing } from "@/types";
 
@@ -15,6 +16,7 @@ export default function EditListingPage() {
   const router = useRouter();
   const { id } = router.query;
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const { toast } = useToast();
   const [listing, setListing] = useState<Listing | null>(null);
   const [saving, setSaving] = useState(false);
@@ -60,28 +62,28 @@ export default function EditListingPage() {
     });
     setSaving(false);
     if (res.ok) {
-      toast({ title: "Listing updated" });
+      toast({ title: t("listings.listingUpdated") });
       router.push("/dashboard");
     } else {
-      toast({ title: "Failed to update", variant: "destructive" });
+      toast({ title: t("errors.updateListingFailed"), variant: "destructive" });
     }
   };
 
   const remove = async () => {
-    if (!listing || !confirm("Are you sure you want to delete this listing?")) return;
+    if (!listing || !confirm(t("listings.deleteConfirm"))) return;
     setDeleting(true);
     const res = await fetch(`/api/listings/${listing.id}`, { method: "DELETE" });
     setDeleting(false);
     if (res.ok) {
-      toast({ title: "Listing deleted" });
+      toast({ title: t("listings.listingDeleted") });
       router.push("/dashboard");
     } else {
-      toast({ title: "Failed to delete", variant: "destructive" });
+      toast({ title: t("errors.deleteListingFailed"), variant: "destructive" });
     }
   };
 
   if (loading || !user) return null;
-  if (!listing) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
+  if (!listing) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">{t("common.loading")}</div></div>;
 
   const canEdit = user.role === "admin" || (user.role === "breeder" && listing.breederId === user.id);
 
@@ -90,8 +92,8 @@ export default function EditListingPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="max-w-xl mx-auto px-4 py-16 text-center">
-          <h1 className="font-display text-xl font-bold">Not Authorized</h1>
-          <p className="text-muted-foreground mt-2">You can only edit your own listings.</p>
+          <h1 className="font-display text-xl font-bold">{t("errors.notAuthorized")}</h1>
+          <p className="text-muted-foreground mt-2">{t("errors.onlyOwnListings")}</p>
         </div>
       </div>
     );
@@ -101,82 +103,82 @@ export default function EditListingPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl font-bold mb-6">Edit Listing</h1>
+        <h1 className="font-display text-2xl font-bold mb-6">{t("listings.editListing")}</h1>
 
         <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
           <div>
-            <Label>Title</Label>
+            <Label>{t("listings.title")}</Label>
             <Input value={listing.title} onChange={e => update("title", e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Price (€)</Label>
+              <Label>{t("listings.price")}</Label>
               <Input type="number" value={listing.price} onChange={e => update("price", Number(e.target.value))} />
             </div>
             <div>
-              <Label>Location</Label>
+              <Label>{t("listings.location")}</Label>
               <Input value={listing.location} onChange={e => update("location", e.target.value)} />
             </div>
           </div>
 
           <div>
-            <Label>Gender</Label>
+            <Label>{t("listings.gender")}</Label>
             <Select value={listing.gender} onValueChange={v => update("gender", v as any)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Male">{t("listings.male")}</SelectItem>
+                <SelectItem value="Female">{t("listings.female")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label>Description</Label>
+            <Label>{t("listings.description")}</Label>
             <Textarea value={listing.description} onChange={e => update("description", e.target.value)} rows={4} />
           </div>
 
           <div className="flex gap-4">
             <label className="flex items-center gap-2">
               <Checkbox checked={listing.vaccinated} onCheckedChange={v => update("vaccinated", v)} />
-              <span>Vaccinated</span>
+              <span>{t("filters.vaccinated")}</span>
             </label>
             <label className="flex items-center gap-2">
               <Checkbox checked={listing.microchipped} onCheckedChange={v => update("microchipped", v)} />
-              <span>Microchipped</span>
+              <span>{t("filters.microchipped")}</span>
             </label>
             <label className="flex items-center gap-2">
               <Checkbox checked={listing.pedigree} onCheckedChange={v => update("pedigree", v)} />
-              <span>Pedigree</span>
+              <span>{t("filters.pedigreeDocs")}</span>
             </label>
           </div>
 
           <div>
-            <Label>Health Information</Label>
+            <Label>{t("listings.healthInfo")}</Label>
             <Textarea value={listing.healthInfo || ""} onChange={e => update("healthInfo", e.target.value)} rows={3} />
           </div>
 
           <div>
-            <Label>Parents Information</Label>
+            <Label>{t("listings.parentsInfo")}</Label>
             <Textarea value={listing.parentsInfo || ""} onChange={e => update("parentsInfo", e.target.value)} rows={3} />
           </div>
 
           <div>
-            <Label>Status</Label>
+            <Label>{t("listings.status")}</Label>
             <Select value={listing.status} onValueChange={v => update("status", v as any)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="sold">Sold</SelectItem>
+                <SelectItem value="pending">{t("listings.statusPending")}</SelectItem>
+                <SelectItem value="approved">{t("listings.statusApproved")}</SelectItem>
+                <SelectItem value="sold">{t("listings.statusSold")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</Button>
-            <Button variant="outline" onClick={() => router.push("/dashboard")}>Cancel</Button>
-            <Button variant="destructive" onClick={remove} disabled={deleting} className="ml-auto">{deleting ? "Deleting..." : "Delete"}</Button>
+            <Button onClick={save} disabled={saving}>{saving ? t("common.saving") : t("common.save")}</Button>
+            <Button variant="outline" onClick={() => router.push("/dashboard")}>{t("common.cancel")}</Button>
+            <Button variant="destructive" onClick={remove} disabled={deleting} className="ml-auto">{deleting ? t("common.deleting") : t("common.delete")}</Button>
           </div>
         </div>
       </div>
