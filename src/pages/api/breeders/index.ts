@@ -1,12 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
+import { generateId } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 import type { BreederProfile } from "@/types";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    const db = await getDb();
-    return res.status(200).json({ breederProfiles: db.data.breederProfiles });
+    const { data: breederProfiles } = await supabaseAdmin
+      .from("breeder_profiles")
+      .select("*");
+
+    return res.status(200).json({
+      breederProfiles: (breederProfiles || []).map(bp => ({
+        id: bp.id,
+        userId: bp.user_id,
+        kennelName: bp.kennel_name,
+        about: bp.about,
+        location: bp.location,
+        experienceYears: bp.years_experience || 0,
+        breeds: bp.breeds || [],
+        verified: bp.verified,
+        createdAt: bp.created_at,
+        updatedAt: bp.updated_at,
+      })),
+    });
   }
 
   if (req.method === "POST") {
@@ -15,8 +32,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(403).json({ message: "Must be a breeder" });
       }
 
-      const db = await getDb();
-      const existing = db.data.breederProfiles.find(p => p.userId === user.id);
+      const { data: existing } = await supabaseAdmin
+        .from("breeder_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
       if (existing) {
         return res.status(400).json({ message: "Profile already exists" });
       }
@@ -38,8 +59,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updatedAt: now,
       };
 
-      db.data.breederProfiles.push(profile);
-      await db.write();
+      await supabaseAdmin.from("breeder_profiles").insert({
+        id: profile.id,
+        user_id: profile.userId,
+        kennel_name: profile.kennelName,
+        about: profile.about,
+        location: profile.location,
+        years_experience: profile.experienceYears,
+        breeds: profile.breeds,
+        website: profile.website,
+        verified: profile.verified,
+        created_at: profile.createdAt,
+        updated_at: profile.updatedAt,
+      });
 
       res.status(201).json({ profile });
     })(req, res);
