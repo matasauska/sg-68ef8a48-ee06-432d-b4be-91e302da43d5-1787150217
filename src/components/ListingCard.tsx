@@ -56,7 +56,9 @@ export function ListingCard({ listing, showFavorite = true }: ListingCardProps) 
             {listing.breederName}
           </Link>
           {listing.breederVerified && (
-            <BadgeCheck className="w-3.5 h-3.5 text-primary" />
+            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <BadgeCheck className="w-3 h-3" /> Verified
+            </span>
           )}
         </div>
       </div>
