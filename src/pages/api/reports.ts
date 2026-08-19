@@ -1,40 +1,52 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
-import { requireAuth } from "@/lib/api-helpers";
+import { generateId } from "@/lib/db";
+import { requireAuth, requireAdmin } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     return requireAuth(async (req, res, user) => {
       const { targetType, targetId, reason, details } = req.body;
-      const db = await getDb();
 
       const report = {
         id: generateId(),
-        reporterId: user.id,
-        reporterName: `${user.firstName} ${user.lastName}`,
-        targetType,
-        targetId,
+        reporter_id: user.id,
+        reporter_name: `${user.firstName} ${user.lastName}`,
+        target_type: targetType,
+        target_id: targetId,
         reason,
-        details,
-        status: "open" as const,
-        createdAt: new Date().toISOString(),
+        details: details || "",
+        status: "open",
+        created_at: new Date().toISOString(),
       };
 
-      db.data.reports.push(report);
-      await db.write();
+      const { error } = await supabaseAdmin.from("reports").insert(report);
+      if (error) return res.status(500).json({ message: error.message });
 
       res.status(201).json({ report });
     })(req, res);
   }
 
   if (req.method === "GET") {
-    return requireAuth(async (req, res, user) => {
-      if (user.role !== "admin") {
-        return res.status(403).json({ message: "Admin only" });
-      }
+    return requireAdmin(async (req, res) => {
+      const { data: reports, error } = await supabaseAdmin
+        .from("reports")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      const db = await getDb();
-      res.status(200).json({ reports: db.data.reports });
+      if (error) return res.status(500).json({ message: error.message });
+
+      res.status(200).json({ reports: (reports || []).map(r => ({
+        id: r.id,
+        reporterId: r.reporter_id,
+        reporterName: r.reporter_name,
+        targetType: r.target_type,
+        targetId: r.target_id,
+        reason: r.reason,
+        details: r.details,
+        status: r.status,
+        createdAt: r.created_at,
+      })) });
     })(req, res);
   }
 
