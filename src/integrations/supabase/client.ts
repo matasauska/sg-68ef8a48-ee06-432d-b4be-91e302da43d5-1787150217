@@ -7,7 +7,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error(
-    "Missing Supabase environment variables. Please check your Vercel environment variables."
+    "Missing Supabase environment variables. Please check your environment variables."
   );
 }
 
