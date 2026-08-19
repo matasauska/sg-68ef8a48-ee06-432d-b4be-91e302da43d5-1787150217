@@ -1,27 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
+import { generateId } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     return requireAuth(async (req, res, user) => {
-      const db = await getDb();
-      const conversations = db.data.conversations.filter((c) =>
-        c.participantIds.includes(user.id)
-      );
+      const { data: conversations } = await supabaseAdmin
+        .from("conversations")
+        .select("*")
+        .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`);
 
-      const enriched = conversations.map((c) => {
-        const lastMessage = db.data.messages
-          .filter((m) => m.conversationId === c.id)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-        const unread = db.data.messages.filter(
-          (m) => m.conversationId === c.id && m.senderId !== user.id && !m.read
-        ).length;
-        const otherId = c.participantIds.find((id) => id !== user.id);
-        const otherUser = otherId ? db.data.users.find((u) => u.id === otherId) : null;
-        const otherParticipantName = otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : "Unknown";
-        return { ...c, lastMessage, unread, otherParticipantName };
-      });
+      const enriched = await Promise.all((conversations || []).map(async (c) => {
+        const { data: messages } = await supabaseAdmin
+          .from("messages")
+          .select("*")
+          .eq("conversation_id", c.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        const { data: unreadMessages } = await supabaseAdmin
+          .from("messages")
+          .select("*")
+          .eq("conversation_id", c.id)
+          .neq("sender_id", user.id)
+          .eq("read", false);
+
+        const otherId = c.participant_1_id === user.id ? c.participant_2_id : c.participant_1_id;
+        const { data: otherUser } = await supabaseAdmin
+          .from("profiles")
+          .select("first_name,last_name")
+          .eq("id", otherId)
+          .single();
+
+        return {
+          ...c,
+          lastMessage: messages?.[0] || null,
+          unread: (unreadMessages || []).length,
+          otherParticipantName: otherUser ? `${otherUser.first_name} ${otherUser.last_name}` : "Unknown",
+        };
+      }));
 
       res.status(200).json({ conversations: enriched });
     })(req, res);
@@ -30,45 +48,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     return requireAuth(async (req, res, user) => {
       const { recipientId, listingId, content } = req.body;
-      const db = await getDb();
 
-      let conversation = db.data.conversations.find(
-        (c) =>
-          c.participantIds.includes(user.id) &&
-          c.participantIds.includes(recipientId) &&
-          c.listingId === listingId
-      );
+      const { data: existingConv } = await supabaseAdmin
+        .from("conversations")
+        .select("*")
+        .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${recipientId}),and(participant_1_id.eq.${recipientId},participant_2_id.eq.${user.id})`)
+        .maybeSingle();
 
       const now = new Date().toISOString();
+      let conversationId: string;
 
-      if (!conversation) {
-        const listing = db.data.listings.find((l) => l.id === listingId);
-        conversation = {
-          id: generateId(),
-          participantIds: [user.id, recipientId],
-          listingId,
-          listingTitle: listing?.title,
-          lastMessageAt: now,
-          createdAt: now,
-        };
-        db.data.conversations.push(conversation);
+      if (existingConv) {
+        conversationId = existingConv.id;
+        await supabaseAdmin
+          .from("conversations")
+          .update({ last_message_at: now })
+          .eq("id", conversationId);
+      } else {
+        conversationId = generateId();
+        const { data: listing } = await supabaseAdmin
+          .from("listings")
+          .select("title")
+          .eq("id", listingId)
+          .single();
+
+        await supabaseAdmin.from("conversations").insert({
+          id: conversationId,
+          participant_1_id: user.id,
+          participant_2_id: recipientId,
+          listing_id: listingId,
+          listing_title: listing?.title,
+          last_message_at: now,
+          created_at: now,
+        });
       }
 
       const message = {
         id: generateId(),
-        conversationId: conversation.id,
-        senderId: user.id,
-        senderName: `${user.firstName} ${user.lastName}`,
+        conversation_id: conversationId,
+        sender_id: user.id,
+        sender_name: `${user.firstName} ${user.lastName}`,
         content,
         read: false,
-        createdAt: now,
+        created_at: now,
       };
 
-      db.data.messages.push(message);
-      conversation.lastMessageAt = now;
-      await db.write();
+      await supabaseAdmin.from("messages").insert(message);
 
-      res.status(201).json({ message, conversation });
+      res.status(201).json({ message, conversation: { id: conversationId } });
     })(req, res);
   }
 

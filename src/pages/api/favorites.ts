@@ -1,39 +1,87 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
+import { generateId } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     return requireAuth(async (req, res, user) => {
-      const db = await getDb();
-      const favorites = db.data.favorites.filter((f) => f.userId === user.id);
-      const listings = db.data.listings.filter((l) => favorites.some((f) => f.listingId === l.id));
-      res.status(200).json({ listings });
+      const { data: favorites } = await supabaseAdmin
+        .from("favorites")
+        .select("listing_id")
+        .eq("user_id", user.id);
+
+      const listingIds = (favorites || []).map(f => f.listing_id);
+      if (listingIds.length === 0) {
+        return res.status(200).json({ listings: [] });
+      }
+
+      const { data: listings } = await supabaseAdmin
+        .from("listings")
+        .select("*")
+        .in("id", listingIds);
+
+      res.status(200).json({ listings: (listings || []).map(supabaseToListing) });
     })(req, res);
   }
 
   if (req.method === "POST") {
     return requireAuth(async (req, res, user) => {
       const { listingId } = req.body;
-      const db = await getDb();
 
-      const existing = db.data.favorites.find((f) => f.userId === user.id && f.listingId === listingId);
+      const { data: existing } = await supabaseAdmin
+        .from("favorites")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("listing_id", listingId)
+        .single();
+
       if (existing) {
-        db.data.favorites = db.data.favorites.filter((f) => f.id !== existing.id);
-        await db.write();
+        await supabaseAdmin.from("favorites").delete().eq("id", existing.id);
         return res.status(200).json({ favorited: false });
       }
 
-      db.data.favorites.push({
+      await supabaseAdmin.from("favorites").insert({
         id: generateId(),
-        userId: user.id,
-        listingId,
-        createdAt: new Date().toISOString(),
+        user_id: user.id,
+        listing_id: listingId,
+        created_at: new Date().toISOString(),
       });
-      await db.write();
+
       res.status(201).json({ favorited: true });
     })(req, res);
   }
 
   res.status(405).json({ message: "Method not allowed" });
+}
+
+function supabaseToListing(row: any) {
+  return {
+    id: row.id,
+    breederId: row.breeder_id,
+    breederName: row.breeder_name,
+    breederVerified: row.breeder_verified,
+    title: row.title,
+    animalType: row.animal_type,
+    breed: row.breed,
+    gender: row.gender,
+    dateOfBirth: row.date_of_birth,
+    price: row.price,
+    location: row.location,
+    description: row.description,
+    photos: row.photos || [],
+    videoUrl: row.video_url || undefined,
+    vaccinated: row.vaccinated,
+    microchipped: row.microchipped,
+    pedigree: row.pedigree,
+    healthInfo: row.health_info || undefined,
+    parentsInfo: row.parents_info || undefined,
+    status: row.status,
+    isBoosted: row.is_boosted,
+    isPremium: row.is_premium || row.is_boosted,
+    featured: row.is_featured,
+    viewCount: row.view_count || 0,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }

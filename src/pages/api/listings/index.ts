@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
-import { requireAuth, requireRole } from "@/lib/api-helpers";
+import { generateId } from "@/lib/db";
+import { requireAuth } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 import type { Listing } from "@/types";
 import { z } from "zod";
 
@@ -24,32 +25,36 @@ const createSchema = z.object({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    const db = await getDb();
     const { type, breed, gender, minPrice, maxPrice, location, verified, sort } = req.query;
 
-    let results = db.data.listings.filter((l) => l.status === "approved");
+    let query = supabaseAdmin.from("listings").select("*").eq("status", "approved");
 
     if (type && type !== "all") {
-      results = results.filter((l) => l.animalType === type);
+      query = query.eq("animal_type", type as string);
     }
     if (breed && breed !== "all") {
-      results = results.filter((l) => l.breed === breed);
+      query = query.eq("breed", breed as string);
     }
     if (gender && gender !== "all") {
-      results = results.filter((l) => l.gender === gender);
+      query = query.eq("gender", gender as string);
     }
     if (minPrice) {
-      results = results.filter((l) => l.price >= Number(minPrice));
+      query = query.gte("price", Number(minPrice));
     }
     if (maxPrice) {
-      results = results.filter((l) => l.price <= Number(maxPrice));
+      query = query.lte("price", Number(maxPrice));
     }
     if (location) {
-      results = results.filter((l) => l.location.toLowerCase().includes(String(location).toLowerCase()));
+      query = query.ilike("location", `%${location}%`);
     }
     if (verified === "true") {
-      results = results.filter((l) => l.breederVerified);
+      query = query.eq("breeder_verified", true);
     }
+
+    const { data: listings, error } = await query;
+    if (error) return res.status(500).json({ message: error.message });
+
+    const results = (listings || []).map(supabaseToListing);
 
     if (sort === "newest") {
       results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -75,10 +80,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const data = createSchema.parse(req.body);
-      const db = await getDb();
 
-      const breederProfile = db.data.breederProfiles.find((bp) => bp.userId === user.id);
-      const breederName = breederProfile?.kennelName || `${user.firstName} ${user.lastName}`;
+      const { data: breederProfile } = await supabaseAdmin
+        .from("breeder_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      const breederName = breederProfile?.kennel_name || `${user.firstName} ${user.lastName}`;
       const breederVerified = breederProfile?.verified || false;
 
       const now = new Date().toISOString();
@@ -111,12 +120,74 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updatedAt: now,
       };
 
-      db.data.listings.push(listing);
-      await db.write();
+      const { error } = await supabaseAdmin.from("listings").insert(listingToSupabase(listing));
+      if (error) return res.status(500).json({ message: error.message });
 
       res.status(201).json({ listing });
     })(req, res);
   }
 
   res.status(405).json({ message: "Method not allowed" });
+}
+
+function supabaseToListing(row: any): Listing {
+  return {
+    id: row.id,
+    breederId: row.breeder_id,
+    breederName: row.breeder_name,
+    breederVerified: row.breeder_verified,
+    title: row.title,
+    animalType: row.animal_type,
+    breed: row.breed,
+    gender: row.gender,
+    dateOfBirth: row.date_of_birth,
+    price: row.price,
+    location: row.location,
+    description: row.description,
+    photos: row.photos || [],
+    videoUrl: row.video_url || undefined,
+    vaccinated: row.vaccinated,
+    microchipped: row.microchipped,
+    pedigree: row.pedigree,
+    healthInfo: row.health_info || undefined,
+    parentsInfo: row.parents_info || undefined,
+    status: row.status,
+    isBoosted: row.is_boosted,
+    isPremium: row.is_premium || row.is_boosted,
+    featured: row.is_featured,
+    viewCount: row.view_count || 0,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function listingToSupabase(l: Listing) {
+  return {
+    id: l.id,
+    breeder_id: l.breederId,
+    breeder_name: l.breederName,
+    breeder_verified: l.breederVerified,
+    title: l.title,
+    animal_type: l.animalType,
+    breed: l.breed,
+    gender: l.gender,
+    date_of_birth: l.dateOfBirth,
+    price: l.price,
+    location: l.location,
+    description: l.description,
+    photos: l.photos,
+    video_url: l.videoUrl || null,
+    vaccinated: l.vaccinated,
+    microchipped: l.microchipped,
+    pedigree: l.pedigree,
+    health_info: l.healthInfo || null,
+    parents_info: l.parentsInfo || null,
+    status: l.status,
+    is_boosted: l.isBoosted,
+    is_premium: l.isPremium,
+    is_featured: l.featured,
+    view_count: l.viewCount,
+    created_at: l.createdAt,
+    updated_at: l.updatedAt,
+  };
 }

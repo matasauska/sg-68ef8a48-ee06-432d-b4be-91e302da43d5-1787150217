@@ -1,63 +1,78 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
+import { generateId } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
-  const db = await getDb();
-
-  const conversation = db.data.conversations.find((c) => c.id === id);
-  if (!conversation) {
-    return res.status(404).json({ message: "Conversation not found" });
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid conversation ID" });
   }
 
   if (req.method === "GET") {
     return requireAuth(async (req, res, user) => {
-      if (!conversation.participantIds.includes(user.id)) {
+      const { data: conversation } = await supabaseAdmin
+        .from("conversations")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!conversation) return res.status(404).json({ message: "Conversation not found" });
+
+      const participantIds = [conversation.participant_1_id, conversation.participant_2_id];
+      if (!participantIds.includes(user.id)) {
         return res.status(403).json({ message: "Not authorized" });
       }
 
-      const messages = db.data.messages
-        .filter((m) => m.conversationId === id)
-        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      const { data: messages } = await supabaseAdmin
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at", { ascending: true });
 
-      messages.forEach((m) => {
-        if (m.senderId !== user.id && !m.read) {
-          m.read = true;
-        }
-      });
-      await db.write();
+      await supabaseAdmin
+        .from("messages")
+        .update({ read: true })
+        .eq("conversation_id", id)
+        .neq("sender_id", user.id);
 
-      const otherId = conversation.participantIds.find((pid) => pid !== user.id);
-      const otherUser = otherId ? db.data.users.find((u) => u.id === otherId) : null;
-      const otherParticipantName = otherUser ? `${otherUser.firstName} ${otherUser.lastName}` : "Unknown";
-
-      res.status(200).json({ messages, conversation: { ...conversation, otherParticipantName } });
+      res.status(200).json({ conversation, messages: messages || [] });
     })(req, res);
   }
 
   if (req.method === "POST") {
     return requireAuth(async (req, res, user) => {
-      if (!conversation.participantIds.includes(user.id)) {
+      const { content } = req.body;
+
+      const { data: conversation } = await supabaseAdmin
+        .from("conversations")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!conversation) return res.status(404).json({ message: "Conversation not found" });
+
+      const participantIds = [conversation.participant_1_id, conversation.participant_2_id];
+      if (!participantIds.includes(user.id)) {
         return res.status(403).json({ message: "Not authorized" });
       }
 
-      const { content } = req.body;
       const now = new Date().toISOString();
-
       const message = {
         id: generateId(),
-        conversationId: conversation.id,
-        senderId: user.id,
-        senderName: `${user.firstName} ${user.lastName}`,
+        conversation_id: id,
+        sender_id: user.id,
+        sender_name: `${user.firstName} ${user.lastName}`,
         content,
         read: false,
-        createdAt: now,
+        created_at: now,
       };
 
-      db.data.messages.push(message);
-      conversation.lastMessageAt = now;
-      await db.write();
+      await supabaseAdmin.from("messages").insert(message);
+      await supabaseAdmin
+        .from("conversations")
+        .update({ last_message_at: now })
+        .eq("id", id);
 
       res.status(201).json({ message });
     })(req, res);
