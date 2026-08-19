@@ -19,6 +19,7 @@ export default function CreateListingPage() {
   const [animalTypes, setAnimalTypes] = useState<any[]>([]);
   const [breeds, setBreeds] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [verified, setVerified] = useState<boolean | null>(null);
 
   const [form, setForm] = useState({
     animalType: "",
@@ -41,6 +42,17 @@ export default function CreateListingPage() {
   useEffect(() => {
     if (!loading && !user) router.push("/login");
     if (!loading && user && user.role === "buyer") router.push("/");
+    if (!loading && user && user.role === "breeder") {
+      // Check verification status
+      fetch("/api/verification").then(r => r.json()).then(d => {
+        if (!d || d.status !== "verified") {
+          toast({ title: "Breeder verification required", description: "Please complete verification before posting listings.", variant: "destructive" });
+          router.push("/verification");
+        } else {
+          setVerified(true);
+        }
+      });
+    }
   }, [user, loading, router]);
 
   useEffect(() => {
@@ -87,7 +99,7 @@ export default function CreateListingPage() {
     }
   };
 
-  if (loading || !user) return null;
+  if (loading || !user || verified === null) return null;
 
   const steps = [
     { title: "Animal Type", content: (

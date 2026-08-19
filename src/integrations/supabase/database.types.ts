@@ -328,11 +328,15 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          breeder_verified: boolean | null
           created_at: string | null
           email: string | null
+          first_name: string | null
           full_name: string | null
           id: string
+          is_admin: boolean | null
           is_verified_breeder: boolean
+          last_name: string | null
           location: string | null
           phone: string | null
           role: string | null
@@ -341,11 +345,15 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          breeder_verified?: boolean | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id: string
+          is_admin?: boolean | null
           is_verified_breeder?: boolean
+          last_name?: string | null
           location?: string | null
           phone?: string | null
           role?: string | null
@@ -354,11 +362,15 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          breeder_verified?: boolean | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           is_verified_breeder?: boolean
+          last_name?: string | null
           location?: string | null
           phone?: string | null
           role?: string | null

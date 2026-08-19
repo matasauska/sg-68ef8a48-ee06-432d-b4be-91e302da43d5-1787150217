@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [breederProfile, setBreederProfile] = useState<BreederProfile | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -33,6 +34,7 @@ export default function DashboardPage() {
         setBreederProfile(mine || null);
       });
       fetch(`/api/breeders/${user.id}`).then(r => r.json()).then(d => setReviews(d.reviews || [])).catch(() => {});
+      fetch("/api/verification").then(r => r.json()).then(d => setVerificationStatus(d?.status || null)).catch(() => {});
     }
   }, [user, loading, router]);
 
@@ -42,6 +44,20 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      {user.role === "breeder" && verificationStatus !== "verified" && (
+        <div className="mb-6 bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-destructive" />
+            <div>
+              <p className="font-medium text-destructive">Verification Required</p>
+              <p className="text-sm text-muted-foreground">Complete breeder verification to post listings.</p>
+            </div>
+          </div>
+          <Button size="sm" asChild>
+            <Link href="/verification">Verify Now</Link>
+          </Button>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
