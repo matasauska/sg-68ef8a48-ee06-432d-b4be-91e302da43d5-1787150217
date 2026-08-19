@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb } from "@/lib/db";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -7,12 +7,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { type } = req.query;
-  const db = await getDb();
+  let query = supabaseAdmin.from("breeds").select("*").order("name");
+  if (type) query = query.eq("animal_type_id", String(type));
 
-  if (type) {
-    const breeds = db.data.breeds.filter((b) => b.animalTypeId === type);
-    return res.status(200).json({ breeds });
-  }
-
-  res.status(200).json({ breeds: db.data.breeds });
+  const { data, error } = await query;
+  if (error) return res.status(500).json({ message: error.message });
+  res.status(200).json({ breeds: data || [] });
 }
