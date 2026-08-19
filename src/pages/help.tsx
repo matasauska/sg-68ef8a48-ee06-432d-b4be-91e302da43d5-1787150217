@@ -12,21 +12,13 @@ type ChatMessage = {
   timestamp: Date;
 };
 
-const suggestedQuestions = [
-  "How do I create a listing?",
-  "How does breeder verification work?",
-  "How do I boost my listing?",
-  "How do I contact a breeder?",
-  "How do I change my language?",
-];
-
 export default function HelpPage() {
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hello! I'm the Breedella Assistant. How can I help you today?",
+      content: t("ai.welcome"),
       timestamp: new Date(),
     },
   ]);
@@ -37,6 +29,14 @@ export default function HelpPage() {
   const [ticketDesc, setTicketDesc] = useState("");
   const [ticketSubmitting, setTicketSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const suggestedQuestions = [
+    t("ai.q1"),
+    t("ai.q2"),
+    t("ai.q3"),
+    t("ai.q4"),
+    t("ai.q5"),
+  ];
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -66,7 +66,7 @@ export default function HelpPage() {
         ...prev,
         {
           role: "assistant",
-          content: "I'm having trouble connecting. Please try again later or create a support ticket.",
+          content: t("ai.error"),
           timestamp: new Date(),
         },
       ]);
@@ -79,7 +79,7 @@ export default function HelpPage() {
     setMessages([
       {
         role: "assistant",
-        content: "Hello! I'm the Breedella Assistant. How can I help you today?",
+        content: t("ai.welcome"),
         timestamp: new Date(),
       },
     ]);
@@ -101,7 +101,7 @@ export default function HelpPage() {
       ...prev,
       {
         role: "assistant",
-        content: "Your support ticket has been created. Our team will respond soon!",
+        content: t("help.ticketCreated"),
         timestamp: new Date(),
       },
     ]);
@@ -111,18 +111,18 @@ export default function HelpPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">{t("help.title") || "Help Center"}</h1>
-        <p className="text-muted-foreground mb-6">{t("help.subtitle") || "Get help from our AI assistant or create a support ticket"}</p>
+        <h1 className="text-3xl font-bold mb-2">{t("help.title")}</h1>
+        <p className="text-muted-foreground mb-6">{t("help.subtitle")}</p>
 
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-primary" />
-              <span className="font-semibold">Breedella Assistant</span>
+              <span className="font-semibold">{t("ai.title")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => setShowTicket(true)}>
-                <Ticket className="w-4 h-4 mr-1" /> {t("help.createTicket") || "Ticket"}
+                <Ticket className="w-4 h-4 mr-1" /> {t("help.createTicket")}
               </Button>
               <Button variant="ghost" size="icon" onClick={clearChat}>
                 <Trash2 className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function HelpPage() {
 
           {messages.length === 1 && (
             <div className="px-4 py-2 border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2">Suggested questions:</p>
+              <p className="text-xs text-muted-foreground mb-2">{t("ai.suggestedQuestions")}:</p>
               <div className="flex flex-wrap gap-2">
                 {suggestedQuestions.map((q) => (
                   <button
@@ -188,7 +188,7 @@ export default function HelpPage() {
 
           <div className="p-4 border-t border-border flex gap-2">
             <Input
-              placeholder={t("help.typeMessage") || "Type your message..."}
+              placeholder={t("messages.typeMessage")}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -203,18 +203,18 @@ export default function HelpPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">{t("help.createTicket") || "Create Support Ticket"}</h2>
+                <h2 className="text-xl font-bold">{t("help.createTicket")}</h2>
                 <Button variant="ghost" size="icon" onClick={() => setShowTicket(false)}>
                   <X className="w-5 h-5" />
                 </Button>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">{t("help.subject") || "Subject"}</label>
+                  <label className="text-sm font-medium mb-1 block">{t("help.subject")}</label>
                   <Input value={ticketSubject} onChange={(e) => setTicketSubject(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">{t("help.description") || "Description"}</label>
+                  <label className="text-sm font-medium mb-1 block">{t("help.description")}</label>
                   <textarea
                     className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={ticketDesc}
@@ -222,7 +222,7 @@ export default function HelpPage() {
                   />
                 </div>
                 <Button onClick={submitTicket} disabled={ticketSubmitting || !ticketSubject.trim() || !ticketDesc.trim()} className="w-full">
-                  {ticketSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : t("help.submit") || "Submit Ticket"}
+                  {ticketSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : t("help.submit")}
                 </Button>
               </div>
             </div>

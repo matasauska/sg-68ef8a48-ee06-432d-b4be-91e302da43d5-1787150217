@@ -1,38 +1,16 @@
 import { Header } from "@/components/Header";
+import { useI18n } from "@/hooks/use-i18n";
 import { Search, MessageCircle, Shield, Heart, FileCheck, Star } from "lucide-react";
 
 export default function HowItWorksPage() {
+  const { t } = useI18n();
   const steps = [
-    {
-      icon: Search,
-      title: "Browse & Search",
-      description: "Use our powerful filters to find the perfect breed, age, and location. View detailed listings with photos and health information.",
-    },
-    {
-      icon: Heart,
-      title: "Save Favorites",
-      description: "Create a free account to save listings you love. Compare breeders and animals side by side before making contact.",
-    },
-    {
-      icon: MessageCircle,
-      title: "Contact Breeders",
-      description: "Message breeders directly through our secure platform. Ask questions, arrange visits, and learn about the animal's background.",
-    },
-    {
-      icon: Shield,
-      title: "Verify & Trust",
-      description: "Look for the verified breeder badge. Read reviews from other buyers and check pedigree documentation before committing.",
-    },
-    {
-      icon: FileCheck,
-      title: "Complete Purchase",
-      description: "Arrange payment and pickup directly with the breeder. Always verify documentation and health records in person.",
-    },
-    {
-      icon: Star,
-      title: "Leave a Review",
-      description: "Help the community by sharing your experience. Honest reviews keep Breedela trustworthy for future buyers.",
-    },
+    { icon: Search, title: t("how.browseTitle"), description: t("how.browseDesc") },
+    { icon: Heart, title: t("how.saveTitle"), description: t("how.saveDesc") },
+    { icon: MessageCircle, title: t("how.contactTitle"), description: t("how.contactDesc") },
+    { icon: Shield, title: t("how.verifyTitle"), description: t("how.verifyDesc") },
+    { icon: FileCheck, title: t("how.purchaseTitle"), description: t("how.purchaseDesc") },
+    { icon: Star, title: t("how.reviewTitle"), description: t("how.reviewDesc") },
   ];
 
   return (
@@ -40,8 +18,8 @@ export default function HowItWorksPage() {
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="font-display text-3xl md:text-4xl font-bold">How Breedela Works</h1>
-          <p className="text-muted-foreground mt-2">Finding your new family member is simple and safe</p>
+          <h1 className="font-display text-3xl md:text-4xl font-bold">{t("how.title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("how.subtitle")}</p>
         </div>
 
         <div className="space-y-8">
@@ -52,7 +30,7 @@ export default function HowItWorksPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-primary">Step {i + 1}</span>
+                  <span className="text-sm font-medium text-primary">{t("how.step", { num: i + 1 })}</span>
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1">{step.title}</h3>
                 <p className="text-muted-foreground mt-1">{step.description}</p>
@@ -62,21 +40,14 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-12 bg-muted rounded-2xl p-6 md:p-8">
-          <h2 className="font-display text-xl font-bold mb-4">For Breeders</h2>
+          <h2 className="font-display text-xl font-bold mb-4">{t("how.forBreeders")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              "Create a breeder profile and verify your credentials",
-              "Post listings with photos, pedigrees, and health info",
-              "Respond to buyer messages and manage inquiries",
-              "Mark animals as sold and build your reputation",
-              "Apply for verified status to stand out",
-              "Upgrade your plan for more features",
-            ].map((item, i) => (
+            {[1,2,3,4,5,6].map(i => (
               <div key={i} className="flex items-start gap-2">
                 <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-xs font-medium text-primary">{i + 1}</span>
+                  <span className="text-xs font-medium text-primary">{i}</span>
                 </div>
-                <p className="text-sm">{item}</p>
+                <p className="text-sm">{t(`how.breederStep${i}`)}</p>
               </div>
             ))}
           </div>
