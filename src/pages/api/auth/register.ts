@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb, generateId } from "@/lib/db";
+import { generateId } from "@/lib/db";
 import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -18,34 +19,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const data = registerSchema.parse(req.body);
-    const db = await getDb();
 
-    const existing = db.data.users.find((u) => u.email === data.email);
+    const { data: existing } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("email", data.email)
+      .single();
+
     if (existing) {
       return res.status(409).json({ message: "Email already registered" });
     }
 
     const now = new Date().toISOString();
-    const user = {
-      id: generateId(),
+    const userId = generateId();
+    const passwordHash = await hashPassword(data.password);
+
+    await supabaseAdmin.from("profiles").insert({
+      id: userId,
       email: data.email,
-      passwordHash: await hashPassword(data.password),
+      password_hash: passwordHash,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      full_name: `${data.firstName} ${data.lastName}`,
+      role: data.role,
+      breeder_verified: false,
+      is_verified_breeder: false,
+      is_suspended: false,
+      created_at: now,
+      updated_at: now,
+    });
+
+    const user = {
+      id: userId,
+      email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
+      fullName: `${data.firstName} ${data.lastName}`,
       role: data.role,
+      breederVerified: false,
+      isAdmin: false,
+      isSuspended: false,
       createdAt: now,
       updatedAt: now,
-      isSuspended: false,
     };
 
-    db.data.users.push(user);
-    await db.write();
-
-    const token = await createToken(user);
+    const token = await createToken(user as any);
     res.setHeader("Set-Cookie", setAuthCookie(token));
 
-    const { passwordHash, ...publicUser } = user;
-    res.status(201).json({ user: publicUser });
+    res.status(201).json({ user });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: "Invalid input", errors: error.errors });
