@@ -45,6 +45,17 @@
       "createdAt": "2026-08-18T13:03:53.295Z",
       "updatedAt": "2026-08-18T13:03:53.295Z",
       "isSuspended": false
+    },
+    {
+      "id": "d264b646-5fc4-46bd-b7f0-6457cb58823a",
+      "email": "matastamasaus@gmail.com",
+      "passwordHash": "$2b$10$VaU/p3mOrtGOpiM3kUvGju.bAjWg2ubRe3CwclCFWHjurvW8rsY8C",
+      "firstName": "andrius",
+      "lastName": "dede",
+      "role": "breeder",
+      "createdAt": "2026-08-19T09:58:40.119Z",
+      "updatedAt": "2026-08-19T09:58:40.119Z",
+      "isSuspended": false
     }
   ],
   "breederProfiles": [
