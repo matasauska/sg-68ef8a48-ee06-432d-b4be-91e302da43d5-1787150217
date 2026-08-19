@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function VerificationPage() {
   const router = useRouter();
@@ -28,39 +29,84 @@ export default function VerificationPage() {
     animalIdInfo: "",
   });
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/login");
-  }, [user, authLoading, router]);
+ useEffect(() => {
+  if (!user) return;
 
-  useEffect(() => {
-    if (!user) return;
-    fetch("/api/verification", {
-      headers: { Authorization: `Bearer ${user.token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data) setStatus(data.status);
-      });
-  }, [user]);
+  const loadVerification = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      console.error("No Supabase access token");
+      return;
+    }
+
+    const res = await fetch("/api/verification", {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data) {
+      setStatus(data.status);
+    }
+  };
+
+  loadVerification();
+}, [user]);
 
   const submit = async () => {
-    setSubmitting(true);
+  setSubmitting(true);
+
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      toast({
+        title: "Authentication required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const res = await fetch("/api/verification", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${user!.token}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify(form),
     });
-    setSubmitting(false);
+
+    const data = await res.json();
+
     if (res.ok) {
       setStatus("pending");
-      toast({ title: t("verification.submit") });
+      toast({
+        title: t("verification.submit"),
+      });
     } else {
-      toast({ title: t("errors.serverError"), variant: "destructive" });
+      toast({
+        title: data.message || t("errors.serverError"),
+        variant: "destructive",
+      });
     }
-  };
+  } catch (error) {
+    console.error("Verification submission error:", error);
+
+    toast({
+      title: t("errors.serverError"),
+      variant: "destructive",
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (authLoading || !user) return null;
 
