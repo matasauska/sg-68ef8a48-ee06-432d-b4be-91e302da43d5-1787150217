@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import { ListingCard } from "@/components/ListingCard";
-import { Heart, MessageCircle, Package, Plus, Shield, Star, TrendingUp, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
+import { Heart, MessageCircle, Package, Plus, Shield, Star, User } from "lucide-react";
 import type { Listing, Conversation, BreederProfile } from "@/types";
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { user, loading } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -38,40 +40,42 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
+  if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">{t("common.loading")}</div></div>;
   if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       {user.role === "breeder" && verificationStatus !== "verified" && (
-        <div className="mb-6 bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-destructive" />
-            <div>
-              <p className="font-medium text-destructive">Verification Required</p>
-              <p className="text-sm text-muted-foreground">Complete breeder verification to post listings.</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Shield className="w-5 h-5 text-destructive" />
+              <div>
+                <p className="font-medium text-destructive">{t("dashboard.verificationRequired")}</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.verificationRequiredDesc")}</p>
+              </div>
             </div>
+            <Button size="sm" asChild>
+              <Link href="/verification">{t("dashboard.verifyNow")}</Link>
+            </Button>
           </div>
-          <Button size="sm" asChild>
-            <Link href="/verification">Verify Now</Link>
-          </Button>
         </div>
       )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-display text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back, {user.firstName}</p>
+            <h1 className="font-display text-3xl font-bold">{t("dashboard.title")}</h1>
+            <p className="text-muted-foreground mt-1">{t("dashboard.welcomeBack", { name: user.firstName })}</p>
           </div>
           {user.role === "breeder" && (
             <Button asChild>
-              <Link href="/listings/create"><Plus className="w-4 h-4 mr-1" /> Post Listing</Link>
+              <Link href="/listings/create"><Plus className="w-4 h-4 mr-1" /> {t("nav.postListing")}</Link>
             </Button>
           )}
           {user.role === "admin" && (
             <Button variant="outline" asChild>
-              <Link href="/admin"><Shield className="w-4 h-4 mr-1" /> Admin Panel</Link>
+              <Link href="/admin"><Shield className="w-4 h-4 mr-1" /> {t("nav.admin")}</Link>
             </Button>
           )}
         </div>
@@ -84,7 +88,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{listings.length}</p>
-                <p className="text-sm text-muted-foreground">My Listings</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.myListings")}</p>
               </div>
             </div>
           </div>
@@ -95,7 +99,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{favorites.length}</p>
-                <p className="text-sm text-muted-foreground">Favorites</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.favorites")}</p>
               </div>
             </div>
           </div>
@@ -106,7 +110,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{conversations.length}</p>
-                <p className="text-sm text-muted-foreground">Messages</p>
+                <p className="text-sm text-muted-foreground">{t("dashboard.messages")}</p>
               </div>
             </div>
           </div>
@@ -118,7 +122,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{reviews?.length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Reviews</p>
+                  <p className="text-sm text-muted-foreground">{t("listings.reviews")}</p>
                 </div>
               </div>
             </div>
@@ -128,9 +132,9 @@ export default function DashboardPage() {
         {user.role === "breeder" && breederProfile && (
           <div className="mb-8 bg-card rounded-2xl border border-border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-xl font-bold">Breeder Profile</h2>
+              <h2 className="font-display text-xl font-bold">{t("dashboard.breederProfile")}</h2>
               <Button variant="outline" size="sm" asChild>
-                <Link href="/breeder/edit">Edit Profile</Link>
+                <Link href="/breeder/edit">{t("common.edit")}</Link>
               </Button>
             </div>
             <div className="flex items-center gap-4">
@@ -141,7 +145,7 @@ export default function DashboardPage() {
                 <h3 className="font-semibold text-lg">{breederProfile.kennelName}</h3>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{breederProfile.location}</span>
-                  {breederProfile.verified && <Badge className="bg-primary text-primary-foreground text-xs">Verified</Badge>}
+                  {breederProfile.verified && <Badge className="bg-primary text-primary-foreground text-xs">{t("listings.verifiedBreeder")}</Badge>}
                 </div>
               </div>
             </div>
@@ -150,13 +154,13 @@ export default function DashboardPage() {
 
         {listings.length > 0 && (
           <div className="mb-8">
-            <h2 className="font-display text-xl font-bold mb-4">My Listings</h2>
+            <h2 className="font-display text-xl font-bold mb-4">{t("dashboard.myListings")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {listings.slice(0, 3).map(l => <ListingCard key={l.id} listing={l} />)}
             </div>
             {listings.length > 3 && (
               <Button variant="outline" className="mt-4" asChild>
-                <Link href="/my-listings">View all {listings.length} listings</Link>
+                <Link href="/my-listings">{t("common.viewAll")} {listings.length} {t("listings.listingDetails")}</Link>
               </Button>
             )}
           </div>
@@ -164,26 +168,26 @@ export default function DashboardPage() {
 
         {favorites.length > 0 && (
           <div className="mb-8">
-            <h2 className="font-display text-xl font-bold mb-4">Saved Favorites</h2>
+            <h2 className="font-display text-xl font-bold mb-4">{t("dashboard.savedListings")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {favorites.slice(0, 3).map(l => <ListingCard key={l.id} listing={l} />)}
             </div>
             <Button variant="outline" className="mt-4" asChild>
-              <Link href="/favorites">View all favorites</Link>
+              <Link href="/favorites">{t("common.viewAll")} {t("dashboard.favorites")}</Link>
             </Button>
           </div>
         )}
 
         {conversations.length > 0 && (
           <div>
-            <h2 className="font-display text-xl font-bold mb-4">Recent Messages</h2>
+            <h2 className="font-display text-xl font-bold mb-4">{t("dashboard.messages")}</h2>
             <div className="space-y-3">
               {conversations.slice(0, 3).map(c => (
                 <Link key={c.id} href={`/messages/${c.id}`} className="block bg-card rounded-2xl border border-border p-4 hover:shadow-sm transition-shadow">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{c.listingTitle || "Conversation"}</p>
-                      <p className="text-sm text-muted-foreground">{c.lastMessage?.content || "No messages yet"}</p>
+                      <p className="font-medium">{c.listingTitle || t("dashboard.noConversations")}</p>
+                      <p className="text-sm text-muted-foreground">{c.lastMessage?.content || t("dashboard.noConversationsDesc")}</p>
                     </div>
                     <span className="text-xs text-muted-foreground">{new Date(c.lastMessageAt).toLocaleDateString()}</span>
                   </div>
