@@ -36,7 +36,7 @@ export async function getDb() {
     supabaseAdmin.from("reports").select("*"),
   ]);
 
-  const data = {
+  const data: Record<string, any[]> = {
     listings: (listings || []).map(supabaseToListing),
     users: (users || []).map(supabaseToUser),
     conversations: conversations || [],
@@ -53,8 +53,6 @@ export async function getDb() {
   };
 
   const write = async () => {
-    // The shim writes all data back to Supabase
-    // For new records, we upsert everything. This is coarse but works for compatibility.
     if (data.listings.length > 0) {
       await supabaseAdmin.from("listings").upsert(data.listings.map(listingToSupabase));
     }
@@ -209,12 +207,11 @@ function supabaseToBreederProfile(row: any) {
     about: row.about,
     location: row.location,
     website: row.website,
-    phone: row.phone,
-    email: row.email,
     breeds: row.breeds || [],
-    yearsExperience: row.years_experience,
+    experienceYears: row.years_experience || row.experience_years || 0,
     verified: row.verified,
-    registrationNumber: row.registration_number,
+    verificationRequested: false,
+    totalListings: 0,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -225,15 +222,12 @@ function breederProfileToSupabase(bp: any) {
     id: bp.id,
     user_id: bp.userId,
     kennel_name: bp.kennelName,
-    about: bp.about || null,
-    location: bp.location || null,
-    website: bp.website || null,
-    phone: bp.phone || null,
-    email: bp.email || null,
+    about: bp.about,
+    location: bp.location,
+    website: bp.website,
     breeds: bp.breeds,
-    years_experience: bp.yearsExperience || null,
+    years_experience: bp.experienceYears || bp.yearsExperience,
     verified: bp.verified,
-    registration_number: bp.registrationNumber || null,
     created_at: bp.createdAt,
     updated_at: bp.updatedAt,
   };
