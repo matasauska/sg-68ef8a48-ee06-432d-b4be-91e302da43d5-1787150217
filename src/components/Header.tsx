@@ -105,7 +105,7 @@ export function Header() {
             )}
           </div>
 
-          <button className="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+          <button className="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)} aria-label={t("nav.menu")}>
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
