@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
 import { Bell, MessageSquare, CheckCircle, AlertTriangle, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -18,6 +19,7 @@ interface NotificationItem {
 export default function NotificationsPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   useEffect(() => {
@@ -26,13 +28,12 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!user) return;
-    // Demo notifications based on user role
     const demo: NotificationItem[] = [
       {
         id: "1",
         type: "system",
-        title: "Welcome to Breedela",
-        description: "Complete your profile to get started.",
+        title: t("notifications.welcome"),
+        description: t("notifications.completeProfile"),
         read: false,
         createdAt: new Date(Date.now() - 86400000).toISOString(),
         link: "/dashboard",
@@ -40,8 +41,8 @@ export default function NotificationsPage() {
       {
         id: "2",
         type: "listing",
-        title: "Listing approved",
-        description: "Your listing 'Luna - Maine Coon' has been approved.",
+        title: t("notifications.listingApproved"),
+        description: t("notifications.listingApprovedDesc"),
         read: false,
         createdAt: new Date(Date.now() - 172800000).toISOString(),
         link: "/dashboard",
@@ -49,15 +50,15 @@ export default function NotificationsPage() {
       {
         id: "3",
         type: "message",
-        title: "New message",
-        description: "You received a message about Golden Retriever puppy.",
+        title: t("notifications.newMessage"),
+        description: t("notifications.newMessageDesc"),
         read: true,
         createdAt: new Date(Date.now() - 259200000).toISOString(),
         link: "/messages",
       },
     ];
     setNotifications(demo);
-  }, [user]);
+  }, [user, t]);
 
   const markRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
@@ -82,14 +83,14 @@ export default function NotificationsPage() {
       <Header />
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display text-3xl font-bold">Notifications</h1>
-          <button onClick={markAllRead} className="text-sm text-primary hover:underline">Mark all read</button>
+          <h1 className="font-display text-3xl font-bold">{t("nav.notifications")}</h1>
+          <button onClick={markAllRead} className="text-sm text-primary hover:underline">{t("notifications.markAllRead")}</button>
         </div>
 
         {notifications.length === 0 ? (
           <div className="text-center py-16 bg-muted/30 rounded-2xl">
             <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No notifications</p>
+            <p className="text-muted-foreground">{t("notifications.noNotifications")}</p>
           </div>
         ) : (
           <div className="space-y-3">
