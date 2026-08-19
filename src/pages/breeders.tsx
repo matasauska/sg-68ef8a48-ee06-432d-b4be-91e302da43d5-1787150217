@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/hooks/use-i18n";
 import { BadgeCheck, MapPin, Star, Search } from "lucide-react";
 import type { BreederProfile } from "@/types";
 
 export default function BreedersPage() {
+  const { t } = useI18n();
   const [breeders, setBreeders] = useState<BreederProfile[]>([]);
   const [query, setQuery] = useState("");
 
@@ -23,12 +25,12 @@ export default function BreedersPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="font-display text-3xl font-bold mb-6">Breeders</h1>
+        <h1 className="font-display text-3xl font-bold mb-6">{t("nav.breeders")}</h1>
         
         <div className="relative max-w-md mb-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
-            placeholder="Search breeders by name, location, or breed..."
+            placeholder={t("filters.searchBreeder")}
             className="pl-9"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -50,7 +52,7 @@ export default function BreedersPage() {
                   <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                     <MapPin className="w-3.5 h-3.5" /> {breeder.location}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">{breeder.experienceYears} years experience</p>
+                  <p className="text-sm text-muted-foreground mt-1">{breeder.experienceYears} {t("listings.yearsExperience")}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {breeder.breeds?.map(br => (
                       <span key={br} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{br}</span>
@@ -64,7 +66,7 @@ export default function BreedersPage() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">No breeders found matching your search.</div>
+          <div className="text-center py-12 text-muted-foreground">{t("listings.noListings")}</div>
         )}
       </div>
     </div>
