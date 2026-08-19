@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import en from "../../locales/en/common.json";
+import lt from "../../locales/lt/common.json";
+import ru from "../../locales/ru/common.json";
+import pl from "../../locales/pl/common.json";
+import es from "../../locales/es/common.json";
+import de from "../../locales/de/common.json";
+import fr from "../../locales/fr/common.json";
 
 export type Locale = "en" | "lt" | "ru" | "pl" | "es" | "de" | "fr";
+
+const translationsMap: Record<Locale, any> = { en, lt, ru, pl, es, de, fr };
 
 const defaultLocale: Locale = "en";
 
@@ -20,24 +29,15 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale);
-  const [translations, setTranslations] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem("breedella-locale") : null;
-    if (saved) setLocaleState(saved as Locale);
+    if (saved && saved in translationsMap) {
+      setLocaleState(saved as Locale);
+    }
+    setLoading(false);
   }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/locales/${locale}/common.json`)
-      .then((r) => r.json())
-      .then((data) => {
-        setTranslations(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
@@ -49,8 +49,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const t = useCallback(
     (key: string, params?: Record<string, string | number>): string => {
-      let value = getNestedValue(translations, key);
-      if (typeof value !== "string") return key;
+      const data = translationsMap[locale] || translationsMap[defaultLocale];
+      let value = getNestedValue(data, key);
+      if (typeof value !== "string") {
+        // Fallback to English if key missing in current locale
+        const fallback = getNestedValue(translationsMap[defaultLocale], key);
+        value = typeof fallback === "string" ? fallback : key;
+      }
       if (params) {
         Object.entries(params).forEach(([k, v]) => {
           value = value.replace(new RegExp(`{${k}}`, "g"), String(v));
@@ -58,7 +63,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       }
       return value;
     },
-    [translations]
+    [locale]
   );
 
   const availableLocales = [
