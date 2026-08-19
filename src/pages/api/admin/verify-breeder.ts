@@ -1,20 +1,37 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getDb } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-helpers";
+import { supabaseAdmin } from "@/integrations/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
 
   return requireAdmin(async (req, res) => {
-    const db = await getDb();
     const { breederId, verified } = req.body;
 
-    const breeder = db.data.breederProfiles.find(b => b.id === breederId);
-    if (!breeder) return res.status(404).json({ message: "Breeder not found" });
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("id", breederId)
+      .single();
 
-    breeder.verified = verified;
-    await db.write();
+    if (error || !profile) return res.status(404).json({ message: "Breeder not found" });
 
-    res.status(200).json({ breeder });
+    await supabaseAdmin
+      .from("profiles")
+      .update({ breeder_verified: verified, is_verified_breeder: verified, role: verified ? "breeder" : "buyer" })
+      .eq("id", breederId);
+
+    await supabaseAdmin
+      .from("breeder_profiles")
+      .update({ verified })
+      .eq("user_id", breederId);
+
+    const { data: updated } = await supabaseAdmin
+      .from("breeder_profiles")
+      .select("*")
+      .eq("user_id", breederId)
+      .single();
+
+    res.status(200).json({ breeder: updated });
   })(req, res);
 }
