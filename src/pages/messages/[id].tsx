@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { ArrowLeft, Send } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import type { Conversation, Message } from "@/types";
 
@@ -12,6 +13,7 @@ export default function ConversationPage() {
   const router = useRouter();
   const { id } = router.query;
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const { toast } = useToast();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -53,11 +55,11 @@ export default function ConversationPage() {
       setNewMessage("");
       await loadMessages();
     } else {
-      toast({ title: "Failed to send message", variant: "destructive" });
+      toast({ title: t("errors.sendMessageFailed"), variant: "destructive" });
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">Loading...</div></div>;
+  if (loading) return <div className="min-h-screen bg-background"><Header /><div className="p-8 text-center">{t("common.loading")}</div></div>;
   if (!user) return null;
 
   return (
@@ -69,7 +71,7 @@ export default function ConversationPage() {
             <Link href="/messages"><ArrowLeft className="w-5 h-5" /></Link>
           </Button>
           <div>
-            <h1 className="font-display text-lg font-bold">{conversation?.listingTitle || "Conversation"}</h1>
+            <h1 className="font-display text-lg font-bold">{conversation?.listingTitle || t("dashboard.noConversations")}</h1>
             <p className="text-sm text-muted-foreground">{conversation?.otherParticipantName}</p>
           </div>
         </div>
@@ -96,7 +98,7 @@ export default function ConversationPage() {
             type="text"
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={t("messages.typeMessage")}
             className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <Button type="submit" size="icon" disabled={!newMessage.trim()}>

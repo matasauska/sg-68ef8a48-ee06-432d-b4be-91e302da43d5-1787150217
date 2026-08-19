@@ -4,12 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
+import { useI18n } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Users, List, CheckCircle, AlertTriangle, Star, DollarSign, FileCheck, XCircle, Clock } from "lucide-react";
 
 export default function AdminPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useI18n();
   const { toast } = useToast();
   const [stats, setStats] = useState<any>(null);
   const [pendingListings, setPendingListings] = useState<any[]>([]);
@@ -37,7 +39,7 @@ export default function AdminPage() {
       body: JSON.stringify({ listingId: id, status: "approved" }),
     });
     if (res.ok) {
-      toast({ title: "Listing approved" });
+      toast({ title: t("admin.listingApproved") });
       setPendingListings(prev => prev.filter(l => l.id !== id));
     }
   };
@@ -49,7 +51,7 @@ export default function AdminPage() {
       body: JSON.stringify({ listingId: id, status: "rejected" }),
     });
     if (res.ok) {
-      toast({ title: "Listing rejected" });
+      toast({ title: t("admin.listingRejected") });
       setPendingListings(prev => prev.filter(l => l.id !== id));
     }
   };
@@ -61,7 +63,7 @@ export default function AdminPage() {
       body: JSON.stringify({ reportId: id, status: action }),
     });
     if (res.ok) {
-      toast({ title: `Report ${action}` });
+      toast({ title: action === "resolved" ? t("admin.reportResolved") : t("admin.reportDismissed") });
       setReports(prev => prev.filter(r => r.id !== id));
     }
   };
@@ -73,7 +75,7 @@ export default function AdminPage() {
       body: JSON.stringify({ verificationId: id, status, adminNotes: reason }),
     });
     if (res.ok) {
-      toast({ title: `Verification ${status}` });
+      toast({ title: `${t("verification.title")} ${status}` });
       setVerifications(prev => prev.filter(v => v.id !== id));
     }
   };
@@ -85,16 +87,16 @@ export default function AdminPage() {
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="font-display text-3xl font-bold mb-8 flex items-center gap-2">
-          <Shield className="w-7 h-7" /> Admin Dashboard
+          <Shield className="w-7 h-7" /> {t("admin.dashboard")}
         </h1>
 
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
-              { label: "Total Users", value: stats.totalUsers, icon: Users },
-              { label: "Total Listings", value: stats.totalListings, icon: List },
-              { label: "Active Listings", value: stats.activeListings, icon: CheckCircle },
-              { label: "Verified Breeders", value: stats.verifiedBreeders, icon: Star },
+              { label: t("admin.totalUsers"), value: stats.totalUsers, icon: Users },
+              { label: t("admin.totalListings"), value: stats.totalListings, icon: List },
+              { label: t("admin.activeListings"), value: stats.activeListings, icon: CheckCircle },
+              { label: t("admin.verifiedBreeders"), value: stats.verifiedBreeders, icon: Star },
             ].map((s, i) => (
               <div key={i} className="bg-card rounded-2xl border border-border p-5">
                 <s.icon className="w-6 h-6 text-muted-foreground mb-2" />
@@ -107,30 +109,30 @@ export default function AdminPage() {
 
         <div className="flex gap-2 mb-6 border-b border-border pb-2">
           <Button variant={activeTab === "listings" ? "default" : "ghost"} size="sm" onClick={() => setActiveTab("listings")}>
-            <List className="w-4 h-4 mr-1" /> Listings ({pendingListings.length})
+            <List className="w-4 h-4 mr-1" /> {t("filters.listings")} ({pendingListings.length})
           </Button>
           <Button variant={activeTab === "verifications" ? "default" : "ghost"} size="sm" onClick={() => setActiveTab("verifications")}>
-            <FileCheck className="w-4 h-4 mr-1" /> Verifications ({verifications.length})
+            <FileCheck className="w-4 h-4 mr-1" /> {t("verification.title")} ({verifications.length})
           </Button>
           <Button variant={activeTab === "reports" ? "default" : "ghost"} size="sm" onClick={() => setActiveTab("reports")}>
-            <AlertTriangle className="w-4 h-4 mr-1" /> Reports ({reports.length})
+            <AlertTriangle className="w-4 h-4 mr-1" /> {t("admin.reports")} ({reports.length})
           </Button>
         </div>
 
         {activeTab === "listings" && (
           <div className="space-y-3">
-            {pendingListings.length === 0 && <p className="text-muted-foreground">No pending listings</p>}
+            {pendingListings.length === 0 && <p className="text-muted-foreground">{t("admin.noPendingListings")}</p>}
             {pendingListings.map(l => (
               <div key={l.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-medium">{l.title}</h3>
                     <p className="text-sm text-muted-foreground">{l.breed} · {l.location} · €{l.price}</p>
-                    <p className="text-sm text-muted-foreground">By {l.breederName}</p>
+                    <p className="text-sm text-muted-foreground">{t("listings.byBreeder")} {l.breederName}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => rejectListing(l.id)}>Reject</Button>
-                    <Button size="sm" onClick={() => approveListing(l.id)}>Approve</Button>
+                    <Button size="sm" variant="outline" onClick={() => rejectListing(l.id)}>{t("common.reject")}</Button>
+                    <Button size="sm" onClick={() => approveListing(l.id)}>{t("common.approve")}</Button>
                   </div>
                 </div>
               </div>
@@ -140,7 +142,7 @@ export default function AdminPage() {
 
         {activeTab === "verifications" && (
           <div className="space-y-3">
-            {verifications.length === 0 && <p className="text-muted-foreground">No pending verifications</p>}
+            {verifications.length === 0 && <p className="text-muted-foreground">{t("admin.noPendingVerifications")}</p>}
             {verifications.map(v => (
               <div key={v.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-start justify-between">
@@ -152,21 +154,21 @@ export default function AdminPage() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">{v.kennel_name} · {v.country}</p>
-                    <p className="text-sm text-muted-foreground">{v.experience_years} years experience · {v.breeds.join(", ")}</p>
+                    <p className="text-sm text-muted-foreground">{v.experience_years} {t("listings.yearsExperience")} · {v.breeds.join(", ")}</p>
                     <p className="text-sm text-muted-foreground mt-1">{v.business_address}</p>
                     <p className="text-sm text-muted-foreground">{v.phone} · {v.email}</p>
                     {v.registration_info && <p className="text-sm text-muted-foreground">Reg: {v.registration_info}</p>}
-                    {v.admin_notes && <p className="text-sm text-destructive mt-1">Admin notes: {v.admin_notes}</p>}
+                    {v.admin_notes && <p className="text-sm text-destructive mt-1">{t("verification.adminNotes")}: {v.admin_notes}</p>}
                   </div>
                   <div className="flex flex-col gap-2 ml-4">
                     <Button size="sm" variant="outline" onClick={() => updateVerification(v.id, "rejected", "Documentation incomplete")}>
-                      <XCircle className="w-4 h-4 mr-1" /> Reject
+                      <XCircle className="w-4 h-4 mr-1" /> {t("common.reject")}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => updateVerification(v.id, "additional_info")}>
-                      <AlertTriangle className="w-4 h-4 mr-1" /> Request Info
+                      <AlertTriangle className="w-4 h-4 mr-1" /> {t("verification.additionalInfo")}
                     </Button>
                     <Button size="sm" onClick={() => updateVerification(v.id, "verified")}>
-                      <CheckCircle className="w-4 h-4 mr-1" /> Verify
+                      <CheckCircle className="w-4 h-4 mr-1" /> {t("common.approve")}
                     </Button>
                   </div>
                 </div>
@@ -177,18 +179,18 @@ export default function AdminPage() {
 
         {activeTab === "reports" && (
           <div className="space-y-3">
-            {reports.length === 0 && <p className="text-muted-foreground">No active reports</p>}
+            {reports.length === 0 && <p className="text-muted-foreground">{t("admin.noReports")}</p>}
             {reports.map(r => (
               <div key={r.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-medium">{r.reason}</h3>
                     <p className="text-sm text-muted-foreground">{r.description}</p>
-                    <p className="text-sm text-muted-foreground">Reporter: {r.reporterName}</p>
+                    <p className="text-sm text-muted-foreground">{t("admin.reporter")}: {r.reporterName}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleReport(r.id, "dismissed")}>Dismiss</Button>
-                    <Button size="sm" onClick={() => handleReport(r.id, "resolved")}>Resolve</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleReport(r.id, "dismissed")}>{t("common.dismiss")}</Button>
+                    <Button size="sm" onClick={() => handleReport(r.id, "resolved")}>{t("common.resolve")}</Button>
                   </div>
                 </div>
               </div>
